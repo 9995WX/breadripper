@@ -100,7 +100,7 @@
   <div id="captcha-container">
     <h1>Validation required to prove you are not a dumb</h1>
 
-    <button class="game-button" onclick="window.location.href='https://heey.cc.cd/youdumb/game'">Play a SiMpLe game</button>
+    <button class="game-button" onclick="window.location.href='/youdumb/game'">Play a SiMpLe game</button>
 
     <p>Or purchase something (NOT AVAILABLE)</p>
     <button class="shop-button" onclick="window.location.href='https://airshop.free.nf'">Go to shop</button>
@@ -145,7 +145,7 @@
       const newBtn = document.createElement("button");
       newBtn.className = "dumb-button";
       newBtn.textContent = "I am DUMB";
-      newBtn.onclick = () => window.location.href = "https://heey.cc.cd/youdumb";
+      newBtn.onclick = () => window.location.href = "/youdumb";
       floatContainer.appendChild(newBtn);
       animateButton(newBtn);
     }, 1000);
