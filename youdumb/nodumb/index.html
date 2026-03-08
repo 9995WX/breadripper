@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Validation required</title>
+  <style>
+    @font-face {
+      font-family: 'CustomFont';
+      src: url('font.ttf') format('truetype');
+    }
+
+    body, html {
+      height: 100%;
+      margin: 0;
+      background: #f9f9f9;
+      font-family: 'CustomFont', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #captcha-container {
+      text-align: left;
+      padding: 2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    h1 {
+      font-size: 4vw;
+    }
+
+    p {
+      font-size: 2vw;
+      margin-top: 1.5rem;
+    }
+
+    button {
+      padding: 1rem 2.5rem;
+      font-size: 2vw;
+      font-family: 'CustomFont', sans-serif;
+      cursor: pointer;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      transition: background-color 0.3s, color 0.3s;
+      display: block;
+      margin-top: 1rem;
+    }
+
+    .shop-button {
+      background-color: #f0f0f0;
+      color: black;
+    }
+
+    .shop-button:hover {
+      background-color: #f0f0f0;
+      color: #333;
+    }
+
+    .game-button {
+      background-color: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+
+    .game-button:hover {
+      background-color: #0056b3;
+    }
+
+    .dumb-button {
+      background-color: #28a745;
+      color: white;
+      border-color: #28a745;
+      position: absolute;
+      z-index: 3;
+    }
+
+    .dumb-button:hover {
+      background-color: #218838;
+    }
+
+    #float-buttons {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    #float-buttons button {
+      pointer-events: all;
+    }
+  </style>
+
+  <link rel="icon" type="image/x-icon" href="/dumb.png">
+</head>
+<body>
+  <div id="captcha-container">
+    <h1>Validation required to prove you are not a dumb</h1>
+
+    <button class="game-button" onclick="window.location.href='https://youdumb.free.nf/game'">Play a SiMpLe game</button>
+
+    <p>Or purchase something (NOT AVAILABLE)</p>
+    <button class="shop-button" onclick="window.location.href='https://airshop.free.nf'">Go to shop</button>
+    <p>Clicking I am DUMB is recommanded</p>
+  </div>
+
+  <div id="float-buttons"></div>
+
+  <script>
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const floatContainer = document.getElementById('float-buttons');
+
+    function randomDirection() {
+      const dx = Math.random() > 0.5 ? 1 : -1;
+      const dy = Math.random() > 0.5 ? 1 : -1;
+      const speed = Math.random() * 2 + 1;
+      return { dx: dx * speed, dy: dy * speed };
+    }
+
+    function animateButton(button) {
+      let x = Math.random() * (screenWidth - 200);
+      let y = Math.random() * (screenHeight - 100);
+      let { dx, dy } = randomDirection();
+
+      function move() {
+        x += dx;
+        y += dy;
+
+        if (x <= 0 || x + button.offsetWidth >= screenWidth) dx = -dx;
+        if (y <= 0 || y + button.offsetHeight >= screenHeight) dy = -dy;
+
+        button.style.left = `${x}px`;
+        button.style.top = `${y}px`;
+        requestAnimationFrame(move);
+      }
+
+      move();
+    }
+
+    setInterval(() => {
+      const newBtn = document.createElement("button");
+      newBtn.className = "dumb-button";
+      newBtn.textContent = "I am DUMB";
+      newBtn.onclick = () => window.location.href = "https://youdumb.free.nf";
+      floatContainer.appendChild(newBtn);
+      animateButton(newBtn);
+    }, 1000);
+  </script>
+</body>
+</html>
