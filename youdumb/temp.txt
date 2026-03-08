@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifyed DUMB, Congratulations!</title>
+    <link rel="icon" type="image/x-icon" href="/dumb.png">
+    
+    <style>
+        @font-face {
+            font-family: 'font';
+            src: url('font.ttf');
+        }
+
+        body {
+            font-family: 'font', sans-serif;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+        }
+
+        p {
+            font-size: 4vw;
+        }
+
+        button {
+            font-family: 'font', sans-serif;
+            font-size: 4vw;
+            padding: 0.5em 1em;
+            margin: 0.5em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #dumb-btn {
+            background-color: green;
+            color: white;
+        }
+
+        #no-btn {
+            background-color: gary;
+            color: black;
+        }
+
+        mark {
+            background-color: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <p>
+
+    </p>
+</body>
+</html>

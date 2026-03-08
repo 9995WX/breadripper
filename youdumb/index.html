@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>I am DUMB</title>
+  <link rel="icon" type="image/x-icon" href="/dumb.png">
+
+  <style>
+    @font-face {
+      font-family: 'font';
+      src: url('font.ttf');
+    }
+
+    :root{
+      --bg:#f5f5f5;
+      --accent:#ffcc00;
+      --muted:#555;
+    }
+
+    *{box-sizing:border-box}
+
+    body {
+      font-family: 'font', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+      flex-direction: column;
+      background-color: var(--bg);
+      overflow: hidden;
+    }
+
+    p {
+      font-size: clamp(22px, 5vw, 40px);
+      margin-bottom: 1em;
+    }
+
+    button {
+      font-family: 'font', inherit;
+      font-size: clamp(20px, 4.5vw, 36px);
+      padding: 0.5em 1.2em;
+      margin: 0.5em;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      position: relative;
+    }
+
+    button:hover { transform: translateY(-2px); }
+
+    #dumb-btn { background-color: green; color: white; }
+    #no-btn  { background-color: gray; color: black; }
+
+    mark { background-color: var(--bg); color: black; padding: 0.2em 0.4em; }
+
+    /* Hidden corner text */
+    #secret-text {
+      position: fixed; top: 8px; left: 10px;
+      font-size: 13px; color: var(--muted); cursor: pointer; opacity: 0.95; user-select: none;
+    }
+
+    /* Popup overlay & dialog */
+    #popup-overlay { position: fixed; inset:0; display:none; align-items:center; justify-content:center; background: rgba(0,0,0,0.35); z-index:999; }
+    #popup { background:#fff; width: min(92%, 360px); padding:16px; border-radius:10px; box-shadow:0 8px 30px rgba(0,0,0,0.18); text-align:center; }
+    #popup p{ font-size:15px; margin:6px 0 8px; }
+    #popup input{ width:86%; padding:8px 10px; font-size:14px; border:1px solid #ddd; border-radius:6px; font-family:'font', inherit; }
+    #popup .btn-row{ margin-top:10px; display:flex; gap:8px; justify-content:center; }
+    #popup button{ font-size:13px; padding:6px 10px; border-radius:6px; font-family:'font', inherit; }
+    #popup .note{ font-size:12px; margin-top:10px; color:#666; }
+  </style>
+
+  <script>
+    let timeLeft = 15; 
+    let timer = null;
+
+    function updateTimer(){
+      const mark = document.getElementById('question');
+      if(!mark) return;
+      mark.textContent = `Are you DUMB and STUPID? Auto-pick in ${timeLeft}...`;
+      timeLeft--;
+      if(timeLeft < 0){ clearInterval(timer); idumb(); }
+    }
+
+    function idumb(){
+      let score = localStorage.getItem('dumbScore') || 0;
+      score = Number(score) + 1;
+      localStorage.setItem('dumbScore', score);
+      alert(`You've admitted you're dumb ${score} time(s).`);
+      window.location.href = 'https://youdumb.free.nf/ofc';
+    }
+
+    function inot(){ window.location.href = 'https://youdumb.free.nf/nodumb'; }
+
+    // Dodge only when mouse is very close
+    function dodge(e){
+      const btn = document.getElementById('no-btn');
+      const rect = btn.getBoundingClientRect();
+      const distance = Math.hypot(e.clientX - (rect.left + rect.width/2), e.clientY - (rect.top + rect.height/2));
+      if(distance < 50){ // only move if cursor is close
+        const padding = 5;
+        const x = Math.floor(Math.random() * (80 - padding*2)) + padding;
+        const y = Math.floor(Math.random() * (80 - padding*2)) + padding;
+        btn.style.position = 'absolute';
+        btn.style.left = x + '%';
+        btn.style.top = y + '%';
+        btn.style.transform = 'translate(-50%,-50%)';
+      }
+    }
+
+    // --- Secret popup handlers ---
+    function openSecret(){
+      const overlay = document.getElementById('popup-overlay');
+      overlay.style.display = 'flex';
+      const input = document.getElementById('code-input');
+      if(input){ setTimeout(()=>input.focus(),50); }
+    }
+    function closeSecret(){ document.getElementById('popup-overlay').style.display = 'none'; }
+    function saveCode(){ alert('Wrong code!'); }
+    function openDoc(){ window.open('https://youdumb.free.nf/doc','_blank'); }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      timer = setInterval(updateTimer,1000);
+      const overlay = document.getElementById('popup-overlay');
+      if(overlay){ overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeSecret(); }); }
+    });
+  </script>
+</head>
+<body>
+  <div id="secret-text" onclick="openSecret()">Don't click me</div>
+
+  <div id="popup-overlay" aria-hidden="true">
+    <div id="popup" role="dialog" aria-modal="true">
+      <p>LIMITED TIME OFFER!<br>You found it! Find a code in the document for some surprise.</p>
+      <input id="code-input" type="text" placeholder="Enter code here..." aria-label="Code input" />
+      <div class="btn-row">
+        <button type="button" onclick="saveCode()">Save</button>
+        <button type="button" onclick="openDoc()">Open the document</button>
+        <button type="button" onclick="closeSecret()">Close</button>
+      </div>
+      <p class="note">Due to technical issues, this function only works on Chromium-based browsers.</p>
+    </div>
+  </div>
+
+  <p><mark id="question">Are you DUMB and STUPID? Auto-pick in ...</mark></p>
+  <button id="dumb-btn" onclick="idumb()">I am DUMB</button>
+  <button id="no-btn" onmousemove="dodge(event)" onclick="inot()">NO</button>
+</body>
+</html>
+

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>I am DUMB</title>
+  <link rel="icon" type="image/x-icon" href="/dumb.png">
+
+  <style>
+    @font-face {
+      font-family: 'font';
+      src: url('font.ttf');
+    }
+
+    body {
+      font-family: 'font', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+      flex-direction: column;
+      background-color: #f5f5f5;
+      overflow: hidden;
+    }
+
+    p {
+      font-size: 4vw;
+      margin-bottom: 1em;
+    }
+
+    button {
+      font-family: 'font', sans-serif;
+      font-size: 4vw;
+      padding: 0.5em 1.2em;
+      margin: 0.5em;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      background-color: #ffcc00 !important;
+      color: black !important;
+    }
+
+    #dumb-btn {
+      background-color: green;
+      color: white;
+    }
+
+    #no-btn {
+      background-color: gray;
+      color: black;
+    }
+
+    mark {
+      background-color: #f5f5f5;
+      color: black;
+      padding: 0.2em 0.4em;
+    }
+  </style>
+
+  <script>
+    let timeLeft = 15;
+
+    function updateTimer() {
+      const mark = document.getElementById('question');
+      mark.textContent = `Are you DUMB and STUPID? Auto-pick in ${timeLeft}...`;
+      timeLeft--;
+
+      if (timeLeft < 0) {
+        clearInterval(timer);
+        idumb();
+      }
+    }
+
+    function idumb() {
+      let score = localStorage.getItem("dumbScore") || 0;
+      score++;
+      localStorage.setItem("dumbScore", score);
+      alert(`You've admitted you're dumb ${score} time(s). `);
+      window.location.href = "https://youdumb.free.nf/ofc";
+    }
+
+    function inot() {
+      window.location.href = "https://youdumb.free.nf/nodumb";
+    }
+
+    function dodge() {
+      const btn = document.getElementById("no-btn");
+      const x = Math.floor(Math.random() * 80);
+      const y = Math.floor(Math.random() * 80);
+      btn.style.position = "absolute";
+      btn.style.left = `${x}%`;
+      btn.style.top = `${y}%`;
+    }
+
+    const timer = setInterval(updateTimer, 1000);
+  </script>
+</head>
+<body>
+  <p><mark id="question">Are you DUMB and STUPID? Auto-pick in ...</mark></p>
+  <button id="dumb-btn" onclick="idumb()">I am DUMB</button><br>
+  <button id="no-btn" onmouseover="dodge()" onclick="inot()">NO</button>
+</body>
+</html>
