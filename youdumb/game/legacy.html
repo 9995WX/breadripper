@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SiMpLe Game</title>
+  <link rel="icon" type="image/x-icon" href="/dumb.png">
+  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+
+  <style>
+    @font-face {
+      font-family: 'font';
+      src: url('font.ttf');
+    }
+
+    body, html {
+      height: 100%;
+      margin: 0;
+      background: #f9f9f9;
+      font-family: 'font', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+      z-index: 1;
+      position: relative;
+      pointer-events: none;
+    }
+
+    #timer {
+      font-size: 3vw;
+      margin-bottom: 1em;
+      z-index: 2;
+      pointer-events: auto;
+    }
+
+    .h-captcha {
+      transform: scale(1.2);
+      z-index: 2;
+      pointer-events: auto;
+    }
+
+    .dumb-button {
+      background-color: #28a745;
+      color: white;
+      border: 2px solid #28a745;
+      border-radius: 8px;
+      font-size: 1.8vw;
+      padding: 0.8rem 1.5rem;
+      cursor: pointer;
+      position: absolute;
+      z-index: 3;
+      font-family: 'font', sans-serif;
+      transition: background-color 0.3s;
+      white-space: nowrap;
+      pointer-events: auto;
+    }
+
+    .dumb-button:hover {
+      background-color: #218838;
+    }
+
+    #float-buttons {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    #float-buttons button {
+      pointer-events: all;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="timer">Time Left: 30s</div>
+    <div class="h-captcha"
+         data-sitekey="4776381a-492e-43b6-9354-6e6a59ea3a90"
+         data-callback="onCaptchaSuccess"
+         data-expired-callback="onCaptchaExpired"
+         data-error-callback="onCaptchaError">
+    </div>
+  </div>
+
+  <div id="float-buttons"></div>
+
+  <script>
+    const timeLimits = [30, 28, 24, 20, 16, 12, 8, 5, 4, 3];
+    let currentRound = 0;
+    let timeLeft = timeLimits[0];
+    let timerInterval;
+
+    const timerDisplay = document.getElementById("timer");
+
+    function startTimer() {
+      timeLeft = timeLimits[currentRound];
+      timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          failOut();
+        }
+      }, 1000);
+    }
+
+    function resetCaptcha() {
+      if (window.hcaptcha) {
+        hcaptcha.reset();
+      }
+    }
+
+    function onCaptchaSuccess() {
+      clearInterval(timerInterval);
+      currentRound++;
+
+      if (currentRound >= 10) {
+        alert("We detected a bot-like activity, please retry.");
+        location.reload();
+        return;
+      }
+
+      alert("Completed! Continue to the next round!");
+      resetCaptcha();
+      startTimer();
+    }
+
+    function onCaptchaExpired() {
+      clearInterval(timerInterval);
+      failOut();
+    }
+
+    function onCaptchaError() {
+      clearInterval(timerInterval);
+      failOut();
+    }
+
+    function failOut() {
+      let dumbScore = localStorage.getItem("dumbScore") || 0;
+      dumbScore++;
+      localStorage.setItem("dumbScore", dumbScore);
+      alert(`You've failed and admitted you're dumb ${dumbScore} time(s).`);
+      window.location.href = "https://youdumb.free.nf/ofc";
+    }
+
+    window.onload = () => {
+      startTimer();
+    };
+
+    // Floating Button Logic
+    const floatContainer = document.getElementById('float-buttons');
+
+    function randomDirection() {
+      const dx = Math.random() > 0.5 ? 1 : -1;
+      const dy = Math.random() > 0.5 ? 1 : -1;
+      const speed = Math.random() * 2 + 1;
+      return { dx: dx * speed, dy: dy * speed };
+    }
+
+    function animateButton(button) {
+      let x = Math.random() * (window.innerWidth - 200);
+      let y = Math.random() * (window.innerHeight - 100);
+      let { dx, dy } = randomDirection();
+
+      function move() {
+        const width = button.offsetWidth || 160;
+        const height = button.offsetHeight || 50;
+
+        x += dx;
+        y += dy;
+
+        if (x <= 0 || x + width >= window.innerWidth) dx = -dx;
+        if (y <= 0 || y + height >= window.innerHeight) dy = -dy;
+
+        button.style.left = `${x}px`;
+        button.style.top = `${y}px`;
+        requestAnimationFrame(move);
+      }
+
+      move();
+    }
+
+    setInterval(() => {
+      const btn = document.createElement("button");
+      btn.textContent = "I am DUMB";
+      btn.className = "dumb-button";
+      btn.onclick = () => {
+        let dumbScore = localStorage.getItem("dumbScore") || 0;
+        dumbScore++;
+        localStorage.setItem("dumbScore", dumbScore);
+        alert(`You've admitted you're dumb ${dumbScore} time(s).`);
+        window.location.href = "https://youdumb.free.nf/ofc";
+      };
+
+      floatContainer.appendChild(btn);
+      animateButton(btn);
+    }, 1000);
+  </script>
+</body>
+</html>
