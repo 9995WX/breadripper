@@ -90,10 +90,10 @@
       score = Number(score) + 1;
       localStorage.setItem('dumbScore', score);
       alert(`You've admitted you're dumb ${score} time(s).`);
-      window.location.href = 'https://youdumb.free.nf/ofc';
+      window.location.href = '/ofc';
     }
 
-    function inot(){ window.location.href = 'https://youdumb.free.nf/nodumb'; }
+    function inot(){ window.location.href = '/nodumb'; }
 
     // Dodge only when mouse is very close
     function dodge(e){
@@ -120,7 +120,7 @@
     }
     function closeSecret(){ document.getElementById('popup-overlay').style.display = 'none'; }
     function saveCode(){ alert('Wrong code!'); }
-    function openDoc(){ window.open('https://youdumb.free.nf/doc','_blank'); }
+    function openDoc(){ window.open('/doc','_blank'); }
 
     document.addEventListener('DOMContentLoaded', ()=>{
       timer = setInterval(updateTimer,1000);
