@@ -150,10 +150,10 @@ bgMusic.src = musicFiles[Math.floor(Math.random() * musicFiles.length)];
     }
 
     function failOut() {
-      let dumbScore = localStorage.getItem("dumbScore") || 0;
-      dumbScore++;
-      localStorage.setItem("dumbScore", dumbScore);
-      alert(`You've failed for ${dumbScore} time(s).`);
+      let dumbScore = localStorage.getItem("failTimes") || 0;
+      failTimes++;
+      localStorage.setItem("failTimes", failTimes);
+      alert(`You've failed for ${failTimes} time(s).`);
       window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
     }
 
