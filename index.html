@@ -39,7 +39,7 @@ a{
   font-size:150%;
 }
 
-/* NEW: position audio at bottom-right */
+/* audio bottom-right */
 audio{
   position:fixed;
   bottom:10px;
@@ -60,11 +60,29 @@ Looking for something else?
 <a href="https://airshop.free.nf">Free online shopping</a><br>
 </div>
 
-<!-- UPDATED audio -->
-<audio controls autoplay loop>
+<audio id="bgm" controls loop>
   <source src="bgm.mp3" type="audio/mpeg">
-  WTF sucks browser you are using that not supporting mp3?
+  Your browser does not support audio.
 </audio>
+
+<script>
+// play audio after first interaction
+const audio = document.getElementById("bgm");
+
+function playAudioOnce() {
+  audio.play();
+  
+  // remove all listeners after first trigger
+  document.removeEventListener("click", playAudioOnce);
+  document.removeEventListener("keydown", playAudioOnce);
+  document.removeEventListener("touchstart", playAudioOnce);
+}
+
+// listen for any interaction
+document.addEventListener("click", playAudioOnce);
+document.addEventListener("keydown", playAudioOnce);
+document.addEventListener("touchstart", playAudioOnce);
+</script>
 
 </body>
 </html>
