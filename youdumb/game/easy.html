@@ -98,7 +98,6 @@ bgMusic.src = musicFiles[Math.floor(Math.random() * musicFiles.length)];
     // === GAME LOGIC ===
     const timeLimits = [30];
     let currentRound = 0;
-	let failTimes = 0
     let timeLeft = timeLimits[0];
     let timerInterval;
 
@@ -151,7 +150,7 @@ bgMusic.src = musicFiles[Math.floor(Math.random() * musicFiles.length)];
     }
 
     function failOut() {
-      let dumbScore = localStorage.getItem("failTimes") || 0;
+      let failTimes = localStorage.getItem("failTimes") || 0;
       failTimes++;
       localStorage.setItem("failTimes", failTimes);
       alert(`You've failed for ${failTimes} time(s).`);
