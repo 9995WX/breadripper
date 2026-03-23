@@ -69,31 +69,6 @@
   <script>
 const bgMusic = document.getElementById('bg-music');
 
-// List of music files
-const musicFiles = ['1.mp3', '2.mp3', '3.mp3', '4.mp3'];
-
-// Pick a random file
-bgMusic.src = musicFiles[Math.floor(Math.random() * musicFiles.length)];
-
-// Try to autoplay music, fallback to click if blocked
-	function playMusic() {
- 	 const playPromise = bgMusic.play();
- 	 if (playPromise !== undefined) {
-  	  playPromise.catch(() => {
-  	    // Autoplay blocked: wait for user interaction
-   	   document.addEventListener('click', startMusicOnce);
-  	  });
- 	 }
-	}
-
-	function startMusicOnce() {
- 	 bgMusic.play();
-	  document.removeEventListener('click', startMusicOnce);
-	}
-
-	// Start on load
-	window.addEventListener('load', playMusic);
-
 
     // === GAME LOGIC ===
     const timeLimits = [30];
