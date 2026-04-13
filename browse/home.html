@@ -15,55 +15,49 @@
             justify-content: center;
             align-items: center;
             font-family: 'Segoe UI', system-ui, sans-serif;
-            /* Background configuration */
             background: url('bg.png') no-repeat center center fixed;
             background-size: cover;
-            overflow: hidden;
         }
 
         .search-container {
             width: 90%;
             max-width: 600px;
-            background: rgba(255, 255, 255, 0.15); /* Glassmorphism effect */
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.4); /* Darker glass for better contrast */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             padding: 40px;
             border-radius: 24px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .search-form {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .search-input {
             flex-grow: 1;
             padding: 15px 25px;
-            border-radius: 30px;
+            border-radius: 50px;
             border: none;
             outline: none;
             font-size: 1.1rem;
-            background: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .search-button {
             padding: 15px 30px;
-            border-radius: 30px;
+            border-radius: 50px;
             border: none;
-            background-color: #00a1f1; /* Bing Blue */
+            background-color: #00a1f1;
             color: white;
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
         }
 
-        .search-button:hover {
-            background-color: #0078d4;
+        .search-button:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
@@ -76,8 +70,7 @@
                 name="q" 
                 class="search-input" 
                 placeholder="Search Bing..." 
-                required 
-                autofocus
+                required
             >
             <button type="submit" class="search-button">Search</button>
         </form>
