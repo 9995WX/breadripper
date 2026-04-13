@@ -5,33 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mock Chrome Browser</title>
     <style>
-        /* Base styles */
-        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f1f3f4; height: 100%; overflow: hidden; }
+        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f1f3f4; height: 100%; overflow: hidden; }
         .browser-container { display: flex; flex-direction: column; height: 100vh; }
         
         /* Tab bar */
         .tab-bar { background-color: #dee1e6; padding: 8px 8px 0 8px; display: flex; align-items: flex-end; }
-        .tab { background-color: #fff; padding: 8px 16px; border-radius: 8px 8px 0 0; font-size: 12px; min-width: 150px; max-width: 240px; display: flex; align-items: center; color: #3c4043; cursor: default; }
+        .tab { background-color: #fff; padding: 8px 16px; border-radius: 8px 8px 0 0; font-size: 12px; min-width: 150px; display: flex; align-items: center; color: #3c4043; }
         .tab svg { width: 16px; height: 16px; margin-right: 8px; fill: #5f6368; }
-        .tab-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; }
         
         /* Toolbar */
         .toolbar { background-color: #fff; padding: 6px 8px; display: flex; align-items: center; gap: 4px; border-bottom: 1px solid #dadce0; }
-        .nav-btn { background: transparent; border: none; font-size: 16px; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #5f6368; transition: background-color 0.2s; }
+        .nav-btn { background: transparent; border: none; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #5f6368; }
         .nav-btn:hover:not(:disabled) { background-color: #f1f3f4; }
-        .nav-btn:disabled { color: #bdc1c6; cursor: default; }
+        .nav-btn:disabled { color: #bdc1c6; }
         .nav-btn svg { width: 20px; height: 20px; fill: currentColor; }
         
-        /* Omnibox (Address Bar) */
-        .omnibox-container { flex-grow: 1; background-color: #f1f3f4; border-radius: 999px; padding: 0 16px; margin: 0 8px; display: flex; align-items: center; height: 34px; border: 1px solid transparent; transition: background-color 0.2s, box-shadow 0.2s; }
-        .omnibox-container:focus-within { background-color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .omnibox { border: none; background: transparent; flex-grow: 1; outline: none; font-size: 14px; color: #202124; font-family: inherit; }
+        /* Address Bar */
+        .omnibox-container { flex-grow: 1; background-color: #f1f3f4; border-radius: 999px; padding: 0 16px; margin: 0 8px; display: flex; align-items: center; height: 34px; border: 1px solid transparent; }
+        .omnibox-container:focus-within { background-color: #fff; border: 1px solid #1a73e8; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .omnibox { border: none; background: transparent; flex-grow: 1; outline: none; font-size: 14px; width: 100%; }
         
         /* Loading Bar */
-        #loading-bar { height: 3px; background-color: #1a73e8; width: 0%; transition: width 0.3s ease; position: absolute; top: 0; left: 0; z-index: 10; opacity: 0; }
+        #loading-bar { height: 3px; background-color: #1a73e8; width: 0%; position: absolute; top: 0; left: 0; transition: width 0.3s; opacity: 0; }
         
-        /* Main content area */
         .content-area { flex-grow: 1; position: relative; background-color: #fff; }
+        /* Added allow-modals to sandbox for alerts */
         iframe { width: 100%; height: 100%; border: none; display: block; }
     </style>
 </head>
@@ -40,27 +38,19 @@
 <div class="browser-container">
     <div class="tab-bar">
         <div class="tab">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-            <span class="tab-title" id="tab-title">New Tab</span>
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+            <span id="tab-title">Home</span>
         </div>
     </div>
 
     <div class="toolbar">
-        <button class="nav-btn" id="btn-back" title="Go back" disabled>
-            <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-        </button>
-        <button class="nav-btn" id="btn-forward" title="Go forward" disabled>
-            <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
-        </button>
-        <button class="nav-btn" id="btn-refresh" title="Reload page">
-            <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-        </button>
-        <button class="nav-btn" id="btn-home" title="Home">
-            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        </button>
+        <button class="nav-btn" id="btn-back" disabled><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+        <button class="nav-btn" id="btn-forward" disabled><svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button>
+        <button class="nav-btn" id="btn-refresh"><svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></button>
+        <button class="nav-btn" id="btn-home"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
         
         <div class="omnibox-container">
-            <input type="text" class="omnibox" id="omnibox" placeholder="Search or type a URL" autocomplete="off">
+            <input type="text" class="omnibox" id="omnibox" placeholder="Search or type a URL">
         </div>
     </div>
 
@@ -71,97 +61,72 @@
 </div>
 
 <script>
-    // Elements
     const iframe = document.getElementById('browser-frame');
     const omnibox = document.getElementById('omnibox');
     const btnBack = document.getElementById('btn-back');
     const btnForward = document.getElementById('btn-forward');
     const btnRefresh = document.getElementById('btn-refresh');
     const btnHome = document.getElementById('btn-home');
-    const tabTitle = document.getElementById('tab-title');
     const loadingBar = document.getElementById('loading-bar');
 
-    // Constants & State
     const HOME_URL = 'https://breadripper.pages.dev/browse/home';
     let historyStack = [];
     let currentIndex = -1;
 
-    // Helper: Format URLs properly (handles example.com -> https://example.com)
     function formatUrl(input) {
         let url = input.trim();
-        if (!url) return '';
-        
-        // If it starts with http/https, leave it alone
-        if (/^https?:\/\//i.test(url)) {
-            return url;
-        }
-        
-        // If it looks like a domain name (contains a dot and no spaces), prepend https://
-        if (url.includes('.') && !url.includes(' ')) {
-            return 'https://' + url;
-        }
-        
-        // Otherwise, treat it as a search query (Using Bing as it allows iframe embedding)
+        if (!url) return HOME_URL; 
+        if (/^https?:\/\//i.test(url)) return url;
+        if (url.includes('.') && !url.includes(' ')) return 'https://' + url;
         return 'https://www.bing.com/search?q=' + encodeURIComponent(url);
     }
 
-    // Navigation function
     function navigateTo(url, isHistoryNavigation = false) {
         const finalUrl = formatUrl(url);
-        if (!finalUrl) return;
-
-        // Update UI
-        omnibox.value = finalUrl;
-        omnibox.blur(); // Remove focus
         
-        // Show fake loading bar
-        loadingBar.style.opacity = '1';
-        loadingBar.style.width = '30%';
-        setTimeout(() => { loadingBar.style.width = '70%'; }, 200);
-
-        // Load the iframe
-        iframe.src = finalUrl;
-        
-        // Extract domain for tab title
-        try {
-            const domain = new URL(finalUrl).hostname.replace('www.', '');
-            tabTitle.textContent = domain || 'New Tab';
-        } catch(e) {
-            tabTitle.textContent = 'Web Page';
+        // Update Address Bar: Empty if it's the home page, otherwise show URL
+        if (finalUrl === HOME_URL) {
+            omnibox.value = '';
+        } else {
+            omnibox.value = finalUrl;
         }
 
-        // Manage History State
+        loadingBar.style.opacity = '1';
+        loadingBar.style.width = '40%';
+        
+        iframe.src = finalUrl;
+
         if (!isHistoryNavigation) {
-            // If navigating forward from a middle state, clear future history
             if (currentIndex < historyStack.length - 1) {
                 historyStack = historyStack.slice(0, currentIndex + 1);
             }
-            // Only add to history if it's different from the current page
             if (historyStack[currentIndex] !== finalUrl) {
                 historyStack.push(finalUrl);
                 currentIndex++;
             }
         }
-        
         updateButtonStates();
     }
 
-    // Update disabled/enabled states for back/forward buttons
     function updateButtonStates() {
         btnBack.disabled = currentIndex <= 0;
         btnForward.disabled = currentIndex >= historyStack.length - 1;
     }
 
-    // Event Listeners
-    omnibox.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            navigateTo(this.value);
+    function syncUI() {
+        try {
+            const currentIframeUrl = iframe.contentWindow.location.href;
+            if (currentIframeUrl !== 'about:blank') {
+                // If the synced URL is home, clear the bar
+                omnibox.value = (currentIframeUrl === HOME_URL) ? '' : currentIframeUrl;
+            }
+        } catch (e) {
+            // Cross-origin restriction; keep current omnibox value
         }
-    });
+    }
 
-    // When clicking the address bar, select all text for easy replacement
-    omnibox.addEventListener('click', function() {
-        this.select();
+    omnibox.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') navigateTo(omnibox.value);
     });
 
     btnBack.addEventListener('click', () => {
@@ -179,62 +144,19 @@
     });
 
     btnRefresh.addEventListener('click', () => {
-        if (historyStack[currentIndex]) {
-            navigateTo(historyStack[currentIndex], true);
-        }
+        iframe.src = iframe.src;
     });
 
-    btnHome.addEventListener('click', () => {
-        navigateTo(HOME_URL);
-    });
+    btnHome.addEventListener('click', () => navigateTo(HOME_URL));
 
-    // Finish loading bar when iframe loads
     iframe.addEventListener('load', () => {
         loadingBar.style.width = '100%';
-        setTimeout(() => {
-            loadingBar.style.opacity = '0';
-            setTimeout(() => { loadingBar.style.width = '0%'; }, 300);
-        }, 300);
+        setTimeout(() => { loadingBar.style.opacity = '0'; loadingBar.style.width = '0%'; }, 300);
+        syncUI();
     });
 
-    // Initial load
+    // Initial Load
     navigateTo(HOME_URL);
-
-// This function attempts to sync the address bar with the iframe's internal location
-function syncAddressBar() {
-    try {
-        // This will ONLY work if the site is on the same domain as your file
-        const currentIframeUrl = iframe.contentWindow.location.href;
-        
-        if (currentIframeUrl !== 'about:blank' && currentIframeUrl !== omnibox.value) {
-            omnibox.value = currentIframeUrl;
-            
-            // Update history stack if it's a new internal navigation
-            if (historyStack[currentIndex] !== currentIframeUrl) {
-                historyStack.push(currentIframeUrl);
-                currentIndex++;
-                updateButtonStates();
-            }
-        }
-    } catch (e) {
-        // If we hit a Security Error (Same-Origin Policy), we just stay silent.
-        // We cannot read the URL of external sites like example.com/abc
-        console.warn("Security restriction: Cannot read URL from a different domain.");
-    }
-}
-
-// Listen for the iframe "load" event
-iframe.addEventListener('load', () => {
-    // 1. Finish the loading bar animation
-    loadingBar.style.width = '100%';
-    setTimeout(() => {
-        loadingBar.style.opacity = '0';
-        setTimeout(() => { loadingBar.style.width = '0%'; }, 300);
-    }, 300);
-
-    // 2. Try to sync the address bar
-    syncAddressBar();
-});
 </script>
 
 </body>
