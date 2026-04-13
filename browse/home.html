@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: url('bg.png') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            overflow: hidden;
+        }
+
+        .glass-card {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 50px 70px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 1s ease-out;
+        }
+
+        #clock {
+            font-size: 5.5rem;
+            font-weight: 200;
+            font-variant-numeric: tabular-nums; /* Prevents text jumping as numbers change */
+            letter-spacing: -1px;
+            margin-bottom: 5px;
+        }
+
+        #greeting {
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 600px) {
+            .glass-card { padding: 30px; }
+            #clock { font-size: 3.5rem; }
+            #greeting { font-size: 0.9rem; letter-spacing: 3px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        <div id="clock">00:00:00</div>
+        <div id="greeting">Welcome</div>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            
+            // Format time with leading zeros
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            
+            document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+            
+            // Update greeting based on time of day
+            const hr = now.getHours();
+            let msg = "Good Evening";
+            if (hr < 12) msg = "Good Morning";
+            else if (hr < 18) msg = "Good Afternoon";
+            
+            document.getElementById('greeting').textContent = msg;
+        }
+
+        // Interval set to 1000ms (1 second)
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+</html>
