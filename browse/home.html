@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Start Page</title>
+    <base target="_top">
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text: #e0e0e0;
+            --accent: #00a1f1; /* Bing Blue */
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+        }
+
+        .search-form {
+            margin-bottom: 40px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 18px 25px;
+            border-radius: 50px;
+            border: none;
+            background: var(--card-bg);
+            color: white;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            outline: none;
+            transition: ring 0.3s;
+        }
+
+        .search-box:focus {
+            box-shadow: 0 0 0 3px var(--accent);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 15px;
+        }
+
+        .tile {
+            background: var(--card-bg);
+            padding: 20px 10px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .tile:hover {
+            background: #3d3d3d;
+            transform: translateY(-3px);
+            border-color: var(--accent);
+        }
+
+        .icon {
+            display: block;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <form action="https://www.bing.com/search" method="GET" class="search-form">
+            <input type="text" name="q" class="search-box" placeholder="Search with Bing..." autofocus>
+        </form>
+
+        <div class="grid">
+            <a href="https://www.bing.com" class="tile">
+                <span class="icon">🦋</span>
+                <span>Bing</span>
+            </a>
+            <a href="https://www.wikipedia.org" class="tile">
+                <span class="icon">📚</span>
+                <span>Wiki</span>
+            </a>
+            <a href="https://www.minecraft.net" class="tile">
+                <span class="icon">🧱</span>
+                <span>Minecraft</span>
+            </a>
+            <a href="https://github.com" class="tile">
+                <span class="icon">🐙</span>
+                <span>GitHub</span>
+            </a>
+            <a href="https://www.bilibili.com" class="tile">
+                <span class="icon">📺</span>
+                <span>Bilibili</span>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
