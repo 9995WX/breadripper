@@ -55,7 +55,7 @@
   <audio id="bg-music" src="msc.mp3" loop preload="auto"></audio>
 
   <div id="game-container">
-    <div id="timer">Time Left: 30s</div>
+    <div id="timer">Time Left: 15s</div>
     <div class="h-captcha"
          data-sitekey="4776381a-492e-43b6-9354-6e6a59ea3a90"
          data-callback="onCaptchaSuccess"
@@ -71,7 +71,7 @@ const bgMusic = document.getElementById('bg-music');
 
 
     // === GAME LOGIC ===
-    const timeLimits = [30];
+    const timeLimits = [15];
     let currentRound = 0;
     let timeLeft = timeLimits[0];
     let timerInterval;
