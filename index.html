@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Looking for sth?</title>
+<style>
+a:link {
+  color: blue;
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+a:visited {
+  color: blue;
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+html, body{
+  height:100%;
+  margin:0;
+}
+
+body{
+  background-image:url('/4Kgood.jpg');
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:100% 100%;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.container{
+  text-align:center;
+}
+
+a{
+  font-size:150%;
+}
+
+/* audio bottom-right */
+audio{
+  position:fixed;
+  bottom:10px;
+  right:10px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<strong style="font-size:300%;">
+Looking for something else?
+</strong><br><br>
+<a href="hifi">Free Hi-Fi musics</a><br>
+<a href="reg">Account register</a><br>
+<a href="youdumb">I am dumb</a><br>
+<a href="/youdumb/game/easy.html">I aM hUmAn</a><br>
+<a href="browse">Free online browser</a><br>
+<a href="https://airshop.free.nf">Free online shopping</a><br>
+</div>
+
+<audio id="bgm" controls loop>
+  <source src="bgm.mp3" type="audio/mpeg">
+  WTF sucks browser you are using that not supporting mp3?
+</audio>
+
+<script>
+// play audio after first interaction
+const audio = document.getElementById("bgm");
+
+function playAudioOnce() {
+  audio.play();
+  
+  // remove all listeners after first trigger
+  document.removeEventListener("click", playAudioOnce);
+  document.removeEventListener("keydown", playAudioOnce);
+  document.removeEventListener("touchstart", playAudioOnce);
+}
+
+// listen for any interaction
+document.addEventListener("click", playAudioOnce);
+document.addEventListener("keydown", playAudioOnce);
+document.addEventListener("touchstart", playAudioOnce);
+</script>
+
+</body>
+</html>
