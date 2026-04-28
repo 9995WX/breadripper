@@ -89,11 +89,14 @@ document.addEventListener("keydown", playAudioOnce);
 document.addEventListener("touchstart", playAudioOnce);
 
 function switchLang(event) {
+  let score = localStorage.getItem('dumbScore') || 0;
+  score = Number(score) + 1;
+  localStorage.setItem('dumbScore', score);
+  alert(`You've admitted you're dumb ${score} time(s).`);
+  
   event.preventDefault();
-
   // open /youdumb/ofc in a new tab
   window.open("/youdumb/ofc", "_blank");
-
   // redirect current page to index_zh
   window.location.href = "index_zh";
 }
