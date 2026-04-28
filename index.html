@@ -60,7 +60,7 @@ Looking for something else?
 <a href="browse">Free online browser</a><br>
 <a href="https://airshop.free.nf">Free online shopping</a><br>
 <!-- By clicking the link, you are sure that you are a dumb who can't read English. We will automatically gives you a certifaction for it. -->
-<a href="youdumb/ofc" target="_blank" onclick="switchLang">
+<a href="youdumb/ofc" target="_blank" onclick="switchLang(event)">
 看不懂英文?点这里換至中文!
 </a>
 </div>
@@ -88,8 +88,15 @@ document.addEventListener("click", playAudioOnce);
 document.addEventListener("keydown", playAudioOnce);
 document.addEventListener("touchstart", playAudioOnce);
 
-function switchLang() {
+function switchLang(event) {
+  event.preventDefault();
+
+  // open /youdumb/ofc in a new tab
+  window.open("/youdumb/ofc", "_blank");
+
+  // redirect current page to index_zh
   window.location.href = "index_zh";
+}
 </script>
 
 </body>
