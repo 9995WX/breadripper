@@ -105,11 +105,11 @@ bgMusic.src = musicFiles[Math.floor(Math.random() * musicFiles.length)];
 
     function startTimer() {
       timeLeft = timeLimits[0];
-      timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+      timerDisplay.textContent = `剩余时间： ${timeLeft}s`;
 
       timerInterval = setInterval(() => {
         timeLeft--;
-        timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+        timerDisplay.textContent = `剩余时间： ${timeLeft}s`;
 
         if (timeLeft <= 0) {
           clearInterval(timerInterval);
@@ -129,12 +129,12 @@ bgMusic.src = musicFiles[Math.floor(Math.random() * musicFiles.length)];
       currentRound++;
 
       if (currentRound >= 100) {
-        alert("We are sorry, but you have to stop, or it will cost a lot of money for us with the captcha. Please try again later.");
-        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+        alert("抱歉，您必须停止操作，否则验证码会给我们带来很多费用。请稍后再试。");
+        window.location.href = "https://b23.tv/1l6UTe2";
         return;
       }
 
-      alert("Completed! Continue to the next round!");
+      alert("完成！进入下一轮！");
       resetCaptcha();
       startTimer();
     }
@@ -153,8 +153,8 @@ bgMusic.src = musicFiles[Math.floor(Math.random() * musicFiles.length)];
       let failTimes = localStorage.getItem("failTimes") || 0;
       failTimes++;
       localStorage.setItem("failTimes", failTimes);
-      alert(`You've failed for ${failTimes} time(s).`);
-      window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+      alert(`你失败了 ${failTimes} 次。`);
+      window.location.href = "https://b23.tv/1l6UTe2";
     }
 
     window.onload = () => {
