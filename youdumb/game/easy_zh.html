@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SiMpLe GaMe</title>
+  <link rel="icon" type="image/x-icon" href="/dumb.png">
+  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+
+  <style>
+    @font-face {
+      font-family: 'font';
+      src: url('font.ttf');
+    }
+
+    body, html {
+      height: 100%;
+      margin: 0;
+      background: #f9f9f9;
+      font-family: 'font', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+      z-index: 1;
+      position: relative;
+      pointer-events: none;
+    }
+
+    #timer {
+      font-size: 3vw;
+      margin-bottom: 1em;
+      z-index: 2;
+      pointer-events: auto;
+    }
+
+    .h-captcha {
+      transform: scale(1.2);
+      z-index: 2;
+      pointer-events: auto;
+    }
+
+
+  </style>
+</head>
+<body>
+  <!-- Background Music -->
+  <audio id="bg-music" src="msc.mp3" loop preload="auto"></audio>
+
+  <div id="game-container">
+    <div id="timer">Time Left: 30s</div>
+    <div class="h-captcha"
+         data-sitekey="4776381a-492e-43b6-9354-6e6a59ea3a90"
+         data-callback="onCaptchaSuccess"
+         data-expired-callback="onCaptchaExpired"
+         data-error-callback="onCaptchaError">
+    </div>
+  </div>
+
+  <div id="float-buttons"></div>
+
+  <script>
+const bgMusic = document.getElementById('bg-music');
+
+// List of music files
+const musicFiles = ['1.mp3', '2.mp3', '3.mp3', '4.mp3'];
+
+// Pick a random file
+bgMusic.src = musicFiles[Math.floor(Math.random() * musicFiles.length)];
+
+// Try to autoplay music, fallback to click if blocked
+	function playMusic() {
+ 	 const playPromise = bgMusic.play();
+ 	 if (playPromise !== undefined) {
+  	  playPromise.catch(() => {
+  	    // Autoplay blocked: wait for user interaction
+   	   document.addEventListener('click', startMusicOnce);
+  	  });
+ 	 }
+	}
+
+	function startMusicOnce() {
+ 	 bgMusic.play();
+	  document.removeEventListener('click', startMusicOnce);
+	}
+
+	// Start on load
+	window.addEventListener('load', playMusic);
+
+
+    // === GAME LOGIC ===
+    const timeLimits = [15];
+    let currentRound = 0;
+    let timeLeft = timeLimits[0];
+    let timerInterval;
+
+    const timerDisplay = document.getElementById("timer");
+
+    function startTimer() {
+      timeLeft = timeLimits[0];
+      timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          failOut();
+        }
+      }, 1000);
+    }
+
+    function resetCaptcha() {
+      if (window.hcaptcha) {
+        hcaptcha.reset();
+      }
+    }
+
+    function onCaptchaSuccess() {
+      clearInterval(timerInterval);
+      currentRound++;
+
+      if (currentRound >= 100) {
+        alert("We are sorry, but you have to stop, or it will cost a lot of money for us with the captcha. Please try again later.");
+        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+        return;
+      }
+
+      alert("Completed! Continue to the next round!");
+      resetCaptcha();
+      startTimer();
+    }
+
+    function onCaptchaExpired() {
+      clearInterval(timerInterval);
+      failOut();
+    }
+
+    function onCaptchaError() {
+      clearInterval(timerInterval);
+      failOut();
+    }
+
+    function failOut() {
+      let failTimes = localStorage.getItem("failTimes") || 0;
+      failTimes++;
+      localStorage.setItem("failTimes", failTimes);
+      alert(`You've failed for ${failTimes} time(s).`);
+      window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+    }
+
+    window.onload = () => {
+      startTimer();
+    };
+
+
+  </script>
+</body>
+</html>
