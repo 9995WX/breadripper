@@ -252,10 +252,10 @@
     fpPromise
       .then(fp => fp.get())
       .then(result => {
-        document.getElementById('fingerprint').textContent = `Fingerprint (FingerprintJS v4): ${result.visitorId}`;
+        document.getElementById('fingerprint').textContent = `FingerprintJS v4 ID: ${result.visitorId}`;
       })
       .catch(() => {
-        document.getElementById('fingerprint').textContent = 'Fingerprint (FingerprintJS v4): Unavailable';
+        document.getElementById('fingerprint').textContent = 'FingerprintJS v4 ID: Unavailable';
       });
 
     // Set date
