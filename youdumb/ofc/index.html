@@ -246,16 +246,16 @@
       });
 
     // Set Fingerprint using FingerprintJS
-    const fpPromise = import('v5.js')
+    const fpPromise = import('./v5.js')
       .then(FingerprintJS => FingerprintJS.load());
 
     fpPromise
       .then(fp => fp.get())
       .then(result => {
-        document.getElementById('fingerprint').textContent = `FingerprintJS v4 ID: ${result.visitorId}`;
+        document.getElementById('fingerprint').textContent = `FingerprintJS v5 ID: ${result.visitorId}`;
       })
       .catch(() => {
-        document.getElementById('fingerprint').textContent = 'FingerprintJS v4 ID: Unavailable';
+        document.getElementById('fingerprint').textContent = 'FingerprintJS v5 ID: Unavailable';
       });
 
     // Set date
