@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Argon2id Hash Generator</title>
+    <script src="./index.umd.min.js"></script>
+</head>
+<body style="font-family:sans-serif; padding:40px; background:#121214; color:#fff;">
+    <h2>Argon2id Hash Generator</h2>
+    <input type="text" id="pass" placeholder="Your secret password" style="padding:8px; width:250px;">
+    <button onclick="makeHash()">Generate Hash</button>
+    <p><strong>Your String to Copy:</strong></p>
+    <textarea id="result" style="width:100%; height:60px; background:#202024; color:#04d361; padding:10px;" readonly></textarea>
+
+    <script>
+        async function makeHash() {
+            const SALT = new Uint8Array([84, 104, 105, 115, 73, 115, 65, 83, 97, 108, 116, 49, 50, 51, 52, 53]);
+            document.getElementById('result').value = "Calculating...";
+            const hash = await hashWasm.argon2id({
+                password: document.getElementById('pass').value,
+                salt: SALT, parallelism: 1, iterations: 2, memorySize: 16384, hashLength: 32, outputType: 'hex'
+            });
+            document.getElementById('result').value = hash;
+        }
+    </script>
+</body>
+</html>
