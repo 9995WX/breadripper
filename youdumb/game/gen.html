@@ -3,67 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Argon2id Hash Generator</title>
-    <script src="./index.umd.min.js" onerror="this.src='https://cdnjs.cloudflare.com/ajax/libs/hash-wasm/4.11.0/index.umd.min.js'"></script>
+    <title>Native Hash Generator</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; background: #121214; color: #fff; }
         .box { max-width: 500px; margin: 0 auto; background: #202024; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
         input { width: 100%; padding: 10px; margin-bottom: 15px; background: #121214; border: 2px solid #29292e; color: #fff; border-radius: 4px; box-sizing: border-box; }
         button { width: 100%; background: #04d361; color: #121214; border: none; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-bottom: 15px; }
         button:hover { background: #06b956; }
-        textarea { width: 100%; height: 80px; background: #121214; color: #04d361; padding: 10px; border: 2px solid #29292e; border-radius: 4px; box-sizing: border-box; font-family: monospace; }
+        textarea { width: 100%; height: 80px; background: #121214; color: #04d361; padding: 10px; border: 2px solid #29292e; border-radius: 4px; box-sizing: border-box; font-family: monospace; font-size: 11px; }
     </style>
 </head>
 <body>
 
 <div class="box">
-    <h2>Argon2id Hash Generator</h2>
+    <h2>Native Password Hash Generator</h2>
+    <p style="color: #a8a8b3; font-size: 0.9rem;">Runs locally using your browser's built-in crypto engine.</p>
+    
     <label for="pass">Enter Your Password:</label>
     <input type="password" id="pass" placeholder="Type secret password here...">
     
-    <button onclick="makeHash()">Generate Hash</button>
+    <button onclick="makeHash()">Generate Secure Hash</button>
     
     <label for="result">Your String to Copy:</label>
-    <textarea id="result" readonly placeholder="Your hash will appear here..."></textarea>
+    <textarea id="result" readonly placeholder="Your hash will appear here instantly..."></textarea>
 </div>
 
 <script>
     async function makeHash() {
+        const password = document.getElementById('pass').value;
         const resultElement = document.getElementById('result');
-        const passwordInput = document.getElementById('pass').value;
 
-        if (!passwordInput) {
+        if (!password) {
             resultElement.value = "Error: Please type a password first!";
             return;
         }
 
-        resultElement.value = "Calculating (this takes 1-2 seconds)...";
-
         try {
-            // Check if the library successfully loaded
-            if (typeof hashWasm === 'undefined') {
-                throw new Error("The 'hash-wasm' security library failed to load. Make sure you are connected to the internet.");
-            }
-
-            // Fixed salt matching your index.html file
-            const SALT = new Uint8Array([84, 104, 105, 115, 73, 115, 65, 83, 97, 108, 116, 49, 50, 51, 52, 53]);
-
-            const hash = await hashWasm.argon2id({
-                password: passwordInput,
-                salt: SALT, 
-                parallelism: 1, 
-                iterations: 2, 
-                memorySize: 16384, // 16MB
-                hashLength: 32, 
-                outputType: 'hex'
-            });
-
-            resultElement.value = hash;
-
+            // Encode password string into bytes
+            const msgBuffer = new TextEncoder().encode(password);                    
+            
+            // Hash the data using native browser SHA-256
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            
+            // Convert ArrayBuffer to Array of bytes
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            
+            // Convert bytes to hex string
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            
+            resultElement.value = hashHex;
         } catch (error) {
-            // Display the exact error in the text area instead of freezing
-            resultElement.value = "⚠️ " + error.message;
-            console.error(error);
+            resultElement.value = "⚠️ Crypto Error: " + error.message;
         }
     }
 </script>
