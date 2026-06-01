@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stat Dashboard & Editor</title>
+    <title>Secure Dashboard</title>
+    <script src="./index.umd.min.js"></script>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             background-color: #121214;
             color: #e1e1e6;
             display: flex;
@@ -15,7 +16,6 @@
             height: 100vh;
             margin: 0;
         }
-
         .card {
             background-color: #202024;
             padding: 2rem;
@@ -23,172 +23,105 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
             width: 100%;
             max-width: 400px;
+            box-sizing: border-box;
         }
-
-        h1 {
-            text-align: center;
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            color: #04d361;
+        h1 { text-align: center; color: #04d361; font-size: 1.5rem; margin-top: 0; }
+        .hidden { display: none !important; }
+        .input-group { margin-bottom: 1.2rem; }
+        label { display: block; margin-bottom: 0.5rem; color: #a8a8b3; font-size: 0.9rem; }
+        input {
+            width: 100%; padding: 0.75rem; background-color: #121214; border: 2px solid #29292e;
+            color: #fff; border-radius: 6px; font-size: 1rem; box-sizing: border-box;
         }
-
-        .stat-group {
-            margin-bottom: 1.5rem;
-            background: #29292e;
-            padding: 1rem;
-            border-radius: 8px;
+        input:focus { outline: none; border-color: #04d361; }
+        button {
+            width: 100%; background-color: #04d361; color: #121214; border: none;
+            padding: 0.75rem; font-size: 1rem; font-weight: bold; border-radius: 6px;
+            cursor: pointer; transition: background 0.2s;
         }
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            color: #a8a8b3;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .input-container {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        input[type="number"] {
-            flex: 1;
-            background-color: #121214;
-            border: 2px solid #29292e;
-            color: #fff;
-            padding: 0.5rem;
-            border-radius: 6px;
-            font-size: 1.2rem;
-            text-align: center;
-            transition: border-color 0.2s;
-        }
-
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #04d361;
-        }
-
-        /* Quick control buttons */
-        .btn-adjust {
-            background-color: #4d4d57;
-            color: white;
-            border: none;
-            padding: 0 0.75rem;
-            font-size: 1.2rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-adjust:hover {
-            background-color: #626270;
-        }
-
-        .btn-submit {
-            width: 100%;
-            background-color: #04d361;
-            color: #121214;
-            border: none;
-            padding: 0.75rem;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: background-color 0.2s;
-        }
-
-        .btn-submit:hover {
-            background-color: #06b956;
-        }
-
-        .status-msg {
-            text-align: center;
-            font-size: 0.85rem;
-            margin-top: 1rem;
-            color: #8257e5;
-            min-height: 1.2rem;
-        }
+        button:hover { background-color: #06b956; }
+        .error-msg { color: #f75a68; font-size: 0.9rem; text-align: center; margin-top: 1rem; min-height: 1.2rem; }
+        .stat-container { background: #29292e; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h1>Database Modifier</h1>
-    
-    <form id="statForm">
-        <div class="stat-group">
-            <label for="failTimes">Fail Times</label>
-            <div class="input-container">
-                <button type="button" class="btn-adjust" onclick="adjust('failTimes', -1)">-</button>
-                <input type="number" id="failTimes" name="failTimes" value="0" min="0">
-                <button type="button" class="btn-adjust" onclick="adjust('failTimes', 1)">+</button>
-            </div>
+    <div id="loginScreen" class="card">
+        <h1>Access Required</h1>
+        <div class="input-group">
+            <label for="passwordField">Enter Password</label>
+            <input type="password" id="passwordField" placeholder="••••••••">
         </div>
+        <button onclick="attemptLogin()">Unlock Dashboard</button>
+        <div id="loginError" class="error-msg"></div>
+    </div>
 
-        <div class="stat-group">
-            <label for="dumbScore">Dumb Score</label>
-            <div class="input-container">
-                <button type="button" class="btn-adjust" onclick="adjust('dumbScore', -1)">-</button>
-                <input type="number" id="dumbScore" name="dumbScore" value="0" min="0">
-                <button type="button" class="btn-adjust" onclick="adjust('dumbScore', 1)">+</button>
-            </div>
+    <div id="dashboardScreen" class="card hidden">
+        <h1>Data Modifier</h1>
+        <div class="stat-container">
+            <label>Fail Times</label>
+            <input type="number" id="failTimes" value="0">
         </div>
-
-        <button type="submit" class="btn-submit">Save Changes</button>
-    </form>
-
-    <div class="status-msg" id="statusMsg"></div>
-</div>
+        <div class="stat-container">
+            <label>Dumb Score</label>
+            <input type="number" id="dumbScore" value="0">
+        </div>
+        <button onclick="saveData()">Save Changes</button>
+        <div id="saveStatus" class="error-msg" style="color: #8257e5;"></div>
+    </div>
 
 <script>
-    // Elements
-    const failTimesInput = document.getElementById('failTimes');
-    const dumbScoreInput = document.getElementById('dumbScore');
-    const statForm = document.getElementById('statForm');
-    const statusMsg = document.getElementById('statusMsg');
+    // ==========================================
+    // PASTE YOUR GENERATED ARGON2ID HASH HERE
+    // ==========================================
+    const CORRECT_HASH = "8ba7bdf55959da3ef2139611de03478dcb4ec7e1898af4ee6637380b0fb6026a"; 
+    
+    // Fixed salt used strictly for client-side matching consistency
+    const SALT = new Uint8Array([84, 104, 105, 115, 73, 115, 65, 83, 97, 108, 116, 49, 50, 51, 52, 53]);
 
-    // Load initial data from localStorage (or default to 0 if empty)
-    function init() {
-        const storedFailTimes = localStorage.getItem('failTimes') || '0';
-        const storedDumbScore = localStorage.getItem('dumbScore') || '0';
-        
-        failTimesInput.value = storedFailTimes;
-        dumbScoreInput.value = storedDumbScore;
+    async function attemptLogin() {
+        const password = document.getElementById('passwordField').value;
+        const errorDiv = document.getElementById('loginError');
+        errorDiv.textContent = "Verifying...";
+
+        try {
+            // Generate Argon2id hash from the user's input
+            const hash = await hashWasm.argon2id({
+                password: password,
+                salt: SALT,
+                parallelism: 1,
+                iterations: 2,
+                memorySize: 16384, // 16MB
+                hashLength: 32,
+                outputType: 'hex'
+            });
+
+            if (hash === CORRECT_HASH) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('dashboardScreen').classList.remove('hidden');
+                loadData();
+            } else {
+                errorDiv.textContent = "Invalid password. Access denied.";
+            }
+        } catch (e) {
+            errorDiv.textContent = "Error processing security protocol.";
+            console.error(e);
+        }
     }
 
-    // Quick +/- adjustment handler
-    function adjust(fieldId, amount) {
-        const input = document.getElementById(fieldId);
-        let currentVal = parseInt(input.value) || 0;
-        currentVal += amount;
-        
-        // Prevent negative values if desired
-        if (currentVal < 0) currentVal = 0;
-        
-        input.value = currentVal;
+    // Storage Management
+    function loadData() {
+        document.getElementById('failTimes').value = localStorage.getItem('failTimes') || '0';
+        document.getElementById('dumbScore').value = localStorage.getItem('dumbScore') || '0';
     }
 
-    // Save data to localStorage on submit
-    statForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        localStorage.setItem('failTimes', failTimesInput.value);
-        localStorage.setItem('dumbScore', dumbScoreInput.value);
-        
-        // Show success confirmation
-        statusMsg.textContent = "Values updated successfully!";
-        setTimeout(() => {
-            statusMsg.textContent = "";
-        }, 2500);
-    });
-
-    // Run on startup
-    init();
+    function saveData() {
+        localStorage.setItem('failTimes', document.getElementById('failTimes').value);
+        localStorage.setItem('dumbScore', document.getElementById('dumbScore').value);
+        const status = document.getElementById('saveStatus');
+        status.textContent = "Changes saved securely!";
+        setTimeout(() => status.textContent = "", 2000);
+    }
 </script>
-
 </body>
 </html>
