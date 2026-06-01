@@ -4,26 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Dashboard</title>
-    <script src="./index.umd.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #121214;
-            color: #e1e1e6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            background-color: #121214; color: #e1e1e6;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; margin: 0;
         }
         .card {
-            background-color: #202024;
-            padding: 2rem;
-            border-radius: 12px;
+            background-color: #202024; padding: 2rem; border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 400px;
-            box-sizing: border-box;
+            width: 100%; max-width: 400px; box-sizing: border-box;
         }
         h1 { text-align: center; color: #04d361; font-size: 1.5rem; margin-top: 0; }
         .hidden { display: none !important; }
@@ -72,31 +63,22 @@
 
 <script>
     // ==========================================
-    // PASTE YOUR GENERATED ARGON2ID HASH HERE
+    // PASTE YOUR GENERATED STRING RIGHT HERE
     // ==========================================
-    const CORRECT_HASH = "8ba7bdf55959da3ef2139611de03478dcb4ec7e1898af4ee6637380b0fb6026a"; 
-    
-    // Fixed salt used strictly for client-side matching consistency
-    const SALT = new Uint8Array([84, 104, 105, 115, 73, 115, 65, 83, 97, 108, 116, 49, 50, 51, 52, 53]);
+    const CORRECT_HASH = "3b612c75a7b5048a435fb6ec81e52ff92d6d795a8b5a9c17070f6a63c97a53b2"; 
 
     async function attemptLogin() {
         const password = document.getElementById('passwordField').value;
         const errorDiv = document.getElementById('loginError');
-        errorDiv.textContent = "Verifying...";
-
+        
         try {
-            // Generate Argon2id hash from the user's input
-            const hash = await hashWasm.argon2id({
-                password: password,
-                salt: SALT,
-                parallelism: 1,
-                iterations: 2,
-                memorySize: 16384, // 16MB
-                hashLength: 32,
-                outputType: 'hex'
-            });
+            // Process the input text natively using browser SHA-256
+            const msgBuffer = new TextEncoder().encode(password);                    
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const inputHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-            if (hash === CORRECT_HASH) {
+            if (inputHash === CORRECT_HASH) {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('dashboardScreen').classList.remove('hidden');
                 loadData();
@@ -104,7 +86,7 @@
                 errorDiv.textContent = "Invalid password. Access denied.";
             }
         } catch (e) {
-            errorDiv.textContent = "Error processing security protocol.";
+            errorDiv.textContent = "Security system error.";
             console.error(e);
         }
     }
