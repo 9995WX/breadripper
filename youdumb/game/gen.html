@@ -1,26 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Argon2id Hash Generator</title>
-    <script src="./index.umd.min.js"></script>
+    <script src="./index.umd.min.js" onerror="this.src='https://cdnjs.cloudflare.com/ajax/libs/hash-wasm/4.11.0/index.umd.min.js'"></script>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; background: #121214; color: #fff; }
+        .box { max-width: 500px; margin: 0 auto; background: #202024; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        input { width: 100%; padding: 10px; margin-bottom: 15px; background: #121214; border: 2px solid #29292e; color: #fff; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; background: #04d361; color: #121214; border: none; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-bottom: 15px; }
+        button:hover { background: #06b956; }
+        textarea { width: 100%; height: 80px; background: #121214; color: #04d361; padding: 10px; border: 2px solid #29292e; border-radius: 4px; box-sizing: border-box; font-family: monospace; }
+    </style>
 </head>
-<body style="font-family:sans-serif; padding:40px; background:#121214; color:#fff;">
-    <h2>Argon2id Hash Generator</h2>
-    <input type="text" id="pass" placeholder="Your secret password" style="padding:8px; width:250px;">
-    <button onclick="makeHash()">Generate Hash</button>
-    <p><strong>Your String to Copy:</strong></p>
-    <textarea id="result" style="width:100%; height:60px; background:#202024; color:#04d361; padding:10px;" readonly></textarea>
+<body>
 
-    <script>
-        async function makeHash() {
-            const SALT = new Uint8Array([84, 104, 105, 115, 73, 115, 65, 83, 97, 108, 116, 49, 50, 51, 52, 53]);
-            document.getElementById('result').value = "Calculating...";
-            const hash = await hashWasm.argon2id({
-                password: document.getElementById('pass').value,
-                salt: SALT, parallelism: 1, iterations: 2, memorySize: 16384, hashLength: 32, outputType: 'hex'
-            });
-            document.getElementById('result').value = hash;
+<div class="box">
+    <h2>Argon2id Hash Generator</h2>
+    <label for="pass">Enter Your Password:</label>
+    <input type="password" id="pass" placeholder="Type secret password here...">
+    
+    <button onclick="makeHash()">Generate Hash</button>
+    
+    <label for="result">Your String to Copy:</label>
+    <textarea id="result" readonly placeholder="Your hash will appear here..."></textarea>
+</div>
+
+<script>
+    async function makeHash() {
+        const resultElement = document.getElementById('result');
+        const passwordInput = document.getElementById('pass').value;
+
+        if (!passwordInput) {
+            resultElement.value = "Error: Please type a password first!";
+            return;
         }
-    </script>
+
+        resultElement.value = "Calculating (this takes 1-2 seconds)...";
+
+        try {
+            // Check if the library successfully loaded
+            if (typeof hashWasm === 'undefined') {
+                throw new Error("The 'hash-wasm' security library failed to load. Make sure you are connected to the internet.");
+            }
+
+            // Fixed salt matching your index.html file
+            const SALT = new Uint8Array([84, 104, 105, 115, 73, 115, 65, 83, 97, 108, 116, 49, 50, 51, 52, 53]);
+
+            const hash = await hashWasm.argon2id({
+                password: passwordInput,
+                salt: SALT, 
+                parallelism: 1, 
+                iterations: 2, 
+                memorySize: 16384, // 16MB
+                hashLength: 32, 
+                outputType: 'hex'
+            });
+
+            resultElement.value = hash;
+
+        } catch (error) {
+            // Display the exact error in the text area instead of freezing
+            resultElement.value = "⚠️ " + error.message;
+            console.error(error);
+        }
+    }
+</script>
 </body>
 </html>
