@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Editor</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #121214; color: #e1e1e6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background-color: #202024; padding: 2rem; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); width: 100%; max-width: 400px; box-sizing: border-box; }
+        h1 { text-align: center; color: #04d361; font-size: 1.5rem; margin-top: 0; }
+        .hidden { display: none !important; }
+        .input-group { margin-bottom: 1.2rem; }
+        label { display: block; margin-bottom: 0.5rem; color: #a8a8b3; font-size: 0.9rem; }
+        input { width: 100%; padding: 0.75rem; background-color: #121214; border: 2px solid #29292e; color: #fff; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
+        input:focus { outline: none; border-color: #04d361; }
+        
+        /* Base button styles */
+        button { width: 100%; background-color: #04d361; color: #121214; border: none; padding: 0.75rem; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+        button:hover { background-color: #06b956; }
+        
+        /* Distinct styled logout button */
+        .btn-logout { background-color: #29292e; color: #f75a68; border: 2px solid #f75a68; margin-top: 0.75rem; }
+        .btn-logout:hover { background-color: #f75a68; color: #121214; }
+
+        .error-msg { text-align: center; margin-top: 1rem; min-height: 1.2rem; font-size: 0.9rem; color: #f75a68; }
+        .stat-container { background: #29292e; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+
+    <div id="loginScreen" class="card">
+        <h1>Action Required</h1>
+        <div class="input-group">
+            <label for="passwordField">Enter Password</label>
+            <input type="password" id="passwordField" placeholder="••••••••">
+        </div>
+        <button onclick="attemptLogin()">Unlock Dashboard</button>
+        <div id="loginError" class="error-msg"></div>
+    </div>
+
+    <div id="dashboardScreen" class="card hidden">
+        <h1>Data Modifier</h1>
+        <div class="stat-container">
+            <label>Fail Times</label>
+            <input type="number" id="failTimes" value="0">
+        </div>
+        <div class="stat-container">
+            <label>Dumb Score</label>
+            <input type="number" id="dumbScore" value="0">
+        </div>
+        <div class="stat-container">
+            <label>Word Per Sec</label>
+            <input type="number" id="wordPerSec" value="0">
+        </div>
+        
+        <button onclick="saveData()">Save Changes</button>
+        <button onclick="logout()" class="btn-logout">Logout / Refresh</button>
+        
+        <div id="saveStatus" class="error-msg" style="color: #8257e5;"></div>
+    </div>
+
+<script>
+    // ==========================================
+    // PASTE YOUR GENERATED SHA-256 HASH HERE
+    // ==========================================
+    const CORRECT_HASH = "3b612c75a7b5048a435fb6ec81e52ff92d6d795a8b5a9c17070f6a63c97a53b2"; // Default: "password"
+
+    async function attemptLogin() {
+        const password = document.getElementById('passwordField').value;
+        const errorDiv = document.getElementById('loginError');
+        errorDiv.textContent = "Verifying...";
+
+        try {
+            const msgBuffer = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const userHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            if (userHash === CORRECT_HASH) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('dashboardScreen').classList.remove('hidden');
+                loadData();
+            } else {
+                errorDiv.textContent = "Invalid password. Access denied.";
+            }
+        } catch (e) {
+            errorDiv.textContent = "Error processing security protocol.";
+            console.error(e);
+        }
+    }
+
+    // Refresh function handles logging out completely
+    function logout() {
+        window.location.reload();
+    }
+
+    // Storage Management
+    function loadData() {
+        document.getElementById('failTimes').value = localStorage.getItem('failTimes') || '0';
+        document.getElementById('dumbScore').value = localStorage.getItem('dumbScore') || '0';
+        // 读取新增的 wordPerSec 数据
+        document.getElementById('wordPerSec').value = localStorage.getItem('wordPerSec') || '0';
+    }
+
+    function saveData() {
+        localStorage.setItem('failTimes', document.getElementById('failTimes').value);
+        localStorage.setItem('dumbScore', document.getElementById('dumbScore').value);
+        // 保存新增的 wordPerSec 数据
+        localStorage.setItem('wordPerSec', document.getElementById('wordPerSec').value);
+        
+        const status = document.getElementById('saveStatus');
+        status.textContent = "Changes saved securely!";
+        setTimeout(() => status.textContent = "", 2000);
+    }
+</script>
+</body>
+</html>
