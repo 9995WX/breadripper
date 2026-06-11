@@ -182,8 +182,8 @@
         // 新增：初始化并读取浏览器的 wordPerSec 配置
         let wordPerSec = localStorage.getItem('wordPerSec');
         if (!wordPerSec || parseInt(wordPerSec) <= 0 || isNaN(parseInt(wordPerSec))) {
-            wordPerSec = 5;
-            localStorage.setItem('wordPerSec', 5);
+            wordPerSec = 8;
+            localStorage.setItem('wordPerSec', 8);
         } else {
             wordPerSec = parseInt(wordPerSec);
         }
