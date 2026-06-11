@@ -89,10 +89,20 @@
             border-radius: 4px;
             cursor: pointer;
             margin-bottom: 10px;
+            transition: background-color 0.2s ease; /* 新增平滑过渡效果 */
         }
         
         .translate-btn:hover {
             background: #0b592e;
+        }
+
+        /* 新增：取消状态时的红色样式 */
+        .translate-btn.cancel-mode {
+            background: #d9381e;
+        }
+
+        .translate-btn.cancel-mode:hover {
+            background: #b52b14;
         }
         
         .translate-btn:disabled {
@@ -263,17 +273,18 @@
             if (isTranslating) {
                 shouldCancel = true;
                 translateBtn.disabled = true;
-                translateBtn.textContent = '正在取消中止...';
+                translateBtn.textContent = '正在取消...';
                 return;
             }
 
             if (!inputText) {
-                resultDiv.textContent = '请输入要翻译的文本 Input here';
+                resultDiv.textContent = '请先输入要翻译的文本 Please input some text first';
                 return;
             }
             
-            // 修改：翻译期间不禁用此按钮，而是将其更变为“取消”状态
+            // 修改：翻译期间不禁用此按钮，而是将其更变为“取消”状态，并染红
             translateBtn.textContent = '取消 Cancel';
+            translateBtn.classList.add('cancel-mode');
             isTranslating = true;
             shouldCancel = false;
 
@@ -333,9 +344,10 @@
                 console.error('翻译失败:', error);
                 resultDiv.textContent = '翻译失败，请稍后重试。';
             } finally {
-                // 恢复按钮和下拉菜单状态
+                // 恢复按钮和下拉菜单状态，移除红色
                 translateBtn.disabled = false;
                 translateBtn.textContent = '翻译 Translate (Ctrl+Enter)';
+                translateBtn.classList.remove('cancel-mode');
                 apiSelect.disabled = false;
                 isTranslating = false;
             }
