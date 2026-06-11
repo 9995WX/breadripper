@@ -217,6 +217,10 @@
             wordPerSec = parseInt(wordPerSec);
         }
 
+        // 新增状态锁：用于控制中途取消翻译
+        let isTranslating = false;
+        let shouldCancel = false;
+
         // 核心翻译函数：调用翻译接口
         async function translateWord(word) {
             if (/^[^a-zA-Z0-9]+$/.test(word) || !word.trim()) {
@@ -255,13 +259,24 @@
             const progressBar = document.getElementById('progressBar');
             const timeRemaining = document.getElementById('timeRemaining');
             
+            // 新增：如果当前正处于翻译状态，此时点击按钮则视为“取消请求”
+            if (isTranslating) {
+                shouldCancel = true;
+                translateBtn.disabled = true;
+                translateBtn.textContent = '正在取消中止...';
+                return;
+            }
+
             if (!inputText) {
                 resultDiv.textContent = '请输入要翻译的文本 Input here';
                 return;
             }
             
-            // 翻译期间禁用按钮和下拉菜单，防止误触
-            translateBtn.disabled = true;
+            // 修改：翻译期间不禁用此按钮，而是将其更变为“取消”状态
+            translateBtn.textContent = '取消 Cancel';
+            isTranslating = true;
+            shouldCancel = false;
+
             apiSelect.disabled = true; 
             resultDiv.innerHTML = '<div class="loading">正在智能翻译...</div>';
             
@@ -277,9 +292,16 @@
             
             try {
                 for (let i = 0; i < words.length; i++) {
+                    // 新增：每次网络请求前检查是否取消
+                    if (shouldCancel) break;
+
                     const startTime = Date.now();
                     
                     const translated = await translateWord(words[i]);
+                    
+                    // 新增：网络请求结束后检查是否取消
+                    if (shouldCancel) break;
+
                     translatedWords.push(translated);
                     
                     const processed = i + 1;
@@ -297,7 +319,15 @@
                 }
                 
                 const finalResult = translatedWords.join('');
-                resultDiv.textContent = finalResult;
+                
+                // 新增：如果是因为中途取消退出，保留已翻译的部分并追加提示（若非点击清空按钮导致）
+                if (shouldCancel) {
+                    if (document.getElementById('inputText').value !== '') {
+                        resultDiv.textContent = finalResult + ' (翻译已取消 Translation Canceled)';
+                    }
+                } else {
+                    resultDiv.textContent = finalResult;
+                }
                 
             } catch (error) {
                 console.error('翻译失败:', error);
@@ -305,7 +335,9 @@
             } finally {
                 // 恢复按钮和下拉菜单状态
                 translateBtn.disabled = false;
+                translateBtn.textContent = '翻译 Translate (Ctrl+Enter)';
                 apiSelect.disabled = false;
+                isTranslating = false;
             }
         }
 
@@ -321,6 +353,8 @@
 
         // 清空按钮点击事件
         document.getElementById('clearBtn').addEventListener('click', function() {
+            if (isTranslating) shouldCancel = true; // 新增：若翻译中途点击清空，同步中止后台循环
+
             document.getElementById('inputText').value = '';
             document.getElementById('result').textContent = '翻译结果将显示在这里 Result here...';
             
