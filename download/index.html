@@ -161,7 +161,7 @@
             <div class="user-detail"><h3>N**N</h3><p>暂无签名</p><a href="#" class="add-friend">+ 加为好友</a></div>
         </div>
         <input type="text" class="code-input" placeholder="请输入提取码">
-        <a href="https://space.bilibili.com/312642275" target="_blank" class="ad-container">
+        <a href="ad" target="_blank" class="ad-container">
             <div class="ad-tag">AD</div><div class="fake-btn">提取文件</div>
         </a>
         <span class="real-extract-link" onclick="openModal('loginModal')">提取文件</span>
@@ -185,7 +185,7 @@
                     <div class="file-icon">
                     </div>
                     <div class="file-info-text">
-                        <div class="file-name">???.jar</div>
+                        <div class="file-name">music.zip</div>
                         <div class="file-meta-line">2026-04-07 19:52 过期时间：永久有效</div>
                     </div>
                 </div>
@@ -194,7 +194,7 @@
                 <div class="big-file-icon">
                     <img src="https://staticwx.cdn.bcebos.com/mini-program/images/ic_compress_v2.png">
                 </div>
-                <div class="file-size-text">文件大小: 1.1pb</div>
+                <div class="file-size-text">文件大小: >1MB</div>
                 <button class="btn-open" onclick="openModal('clientModal')">打开压缩包</button>
             </div>
             <div class="action-bar">
@@ -218,13 +218,13 @@
 <div class="modal-overlay" id="loginModal">
     <div class="modal-content" style="width: 400px;">
         <span style="position:absolute; top:15px; right:15px; cursor:pointer;" onclick="closeModal('loginModal')">×</span>
-        <h3 style="margin-bottom:25px">账号登录</h3>
+        <h3 style="margin-bottom:25px">安全检查-请帮助我们战胜机器人</h3>
         <input type="email" class="login-input" id="emailInput" placeholder="请输入邮箱地址">
         <div class="verify-row">
             <input type="text" class="verify-input" id="verifyInput" placeholder="验证码">
-            <button class="btn-send" id="sendBtn" onclick="sendCode()">发送验证码</button>
+            <button class="btn-send" id="sendBtn" onclick="sendCode()">显示验证码</button>
         </div>
-        <div class="error-msg" id="errorMsg">验证失败，请输入最新收到的验证码</div>
+        <div class="error-msg" id="errorMsg">验证失败，请输入最新显示的验证码</div>
         <button class="btn-login" onclick="doLogin()">立即提取</button>
     </div>
 </div>
@@ -235,7 +235,7 @@
         <div style="width:80px; height:80px; background:#e6f1fc; border-radius:15px; display:inline-block; margin-bottom:20px"></div>
         <h2 style="margin-bottom:15px">请下载“摆渡网盘”客户端</h2>
         <p style="color:#666; margin-bottom:40px; line-height:1.6">该文件体积较大或包含敏感补丁，需通过官方客户端进行安全校验并下载。</p>
-        <button class="btn-login" style="width: auto; padding: 0 40px;">立即下载最新版客户端</button>
+        <button href="client" class="btn-login" style="width: auto; padding: 0 40px;">立即下载最新版客户端</button>
     </div>
 </div>
 
