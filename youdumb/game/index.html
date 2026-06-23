@@ -264,6 +264,10 @@
         const randomResistorValue = resistorValues[Math.floor(Math.random() * resistorValues.length)];
         document.getElementById('circuit-captcha-image').style.backgroundImage = `url('${randomCircuitImage}')`;
         document.getElementById('resistor-captcha-label').textContent = `${randomResistorValue} resistors`;
+        fakeVerifyAttempts = 0;
+        lastFakeCaptchaSelection = null;
+        document.getElementById('captcha-error').style.display = 'none';
+        document.querySelectorAll('.grid-square').forEach(sq => sq.classList.remove('selected'));
         alert("Completed! Continue to the final round!");
         document.querySelector('.h-captcha').style.display = 'none';
         document.getElementById('fake-captcha-container').style.display = 'block';
@@ -300,14 +304,33 @@
       window.location.href = "/youdumb/ofc";
     }
 
-    // Unwinnable Fake Captcha Logic
+    // Fake Captcha Logic
+    let fakeVerifyAttempts = 0;
+    let lastFakeCaptchaSelection = null;
+
+    function getFakeCaptchaSelection() {
+      return Array.from(document.querySelectorAll('.grid-square'))
+        .map((square, index) => square.classList.contains('selected') ? index : null)
+        .filter(index => index !== null)
+        .join(',');
+    }
+
     function fakeVerify() {
       const errorMsg = document.getElementById('captcha-error');
+      const currentSelection = getFakeCaptchaSelection();
+      const selectionChanged = currentSelection !== lastFakeCaptchaSelection;
+      const successChance = selectionChanged ? Math.min(0.05 + fakeVerifyAttempts * 0.10, 1) : 0;
+
+      if (Math.random() < successChance) {
+        clearInterval(timerInterval);
+        alert("You have completed all rounds! However, we have to make sure that you are not a bot. You have to complete an additoinal verification before continuing.");
+        location.href = "/verify";
+        return;
+      }
+
+      lastFakeCaptchaSelection = currentSelection;
+      fakeVerifyAttempts++;
       errorMsg.style.display = 'block';
-      
-      // Clears their selections to annoy them even more while the timer ticks down
-      const squares = document.querySelectorAll('.grid-square');
-      squares.forEach(sq => sq.classList.remove('selected'));
     }
 
     window.onload = () => {
