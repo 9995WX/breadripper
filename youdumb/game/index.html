@@ -158,7 +158,7 @@
     <div id="fake-captcha-container">
       <div class="captcha-header">
         <span>please select all squares with</span>
-        <strong>220Ω resistors</strong>
+        <strong id="resistor-captcha-label">220&Omega; resistors</strong>
       </div>
       
       <div id="circuit-captcha-image" style="position: relative; width: 340px; height: 340px; background-size: cover; background-position: center;">
@@ -260,7 +260,10 @@
       if (currentRound === 9) {
         const circuitImages = ['c1.png', 'c2.png'];
         const randomCircuitImage = circuitImages[Math.floor(Math.random() * circuitImages.length)];
+        const resistorValues = ['220\u03a9', '1k\u03a9', '10k\u03a9'];
+        const randomResistorValue = resistorValues[Math.floor(Math.random() * resistorValues.length)];
         document.getElementById('circuit-captcha-image').style.backgroundImage = `url('${randomCircuitImage}')`;
+        document.getElementById('resistor-captcha-label').textContent = `${randomResistorValue} resistors`;
         alert("Completed! Continue to the final round!");
         document.querySelector('.h-captcha').style.display = 'none';
         document.getElementById('fake-captcha-container').style.display = 'block';
