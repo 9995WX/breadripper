@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Check - Human Verification</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+        .captcha-container {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 350px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background-color: #4a90e2;
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
+        .instruction {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .target {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .countdown {
+            position: absolute;
+            right: 20px;
+            top: 30px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .grid-container {
+            position: relative;
+            width: 330px;
+            height: 330px;
+            margin: 10px auto;
+            background: #fff;
+        }
+        .cell {
+            position: absolute;
+            width: 104px;
+            height: 104px;
+            perspective: 1000px;
+            cursor: pointer;
+            /* 1/3 beat (BPM 100 -> 1 beat 600ms -> 1/3 beat 200ms) */
+            transition: top 0.2s ease-in-out, left 0.2s ease-in-out;
+        }
+        .flipper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.4s;
+            transform-style: preserve-3d;
+        }
+        .cell.face-down .flipper {
+            transform: rotateY(180deg);
+        }
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 2px;
+        }
+        .front {
+            /* front shows image content */
+            background-size: cover;
+            background-position: center center;
+        }
+        .back {
+            /* solid color back */
+            background-color: #8c92ac;
+            transform: rotateY(180deg);
+        }
+        .selected-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 4px solid #4a90e2;
+            background: rgba(255, 255, 255, 0.3);
+            display: none;
+            box-sizing: border-box;
+            z-index: 2;
+        }
+        .cell.selected .selected-overlay {
+            display: block;
+        }
+        .result-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            z-index: 3;
+        }
+        .footer {
+            padding: 10px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            height: 40px;
+        }
+        .verify-btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            display: none;
+        }
+        .verify-btn:hover {
+            background: #357abd;
+        }
+        .icons {
+            display: flex;
+            gap: 15px;
+            color: #777;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="captcha-container">
+    <div class="header" id="header">
+        <div class="instruction" id="instruction">Please select the one containing</div>
+        <div class="target" id="target-name">Loading...</div>
+        <div class="countdown" id="countdown"></div>
+    </div>
+    <div class="grid-container" id="grid">
+    </div>
+    <div class="footer">
+        <div class="icons">↻ 🎧 ℹ️</div>
+        <button class="verify-btn" id="verify-btn">Verify</button>
+    </div>
+</div>
+
+<script>
+    // Theme configuration
+    const THEMES = [
+        {
+            target: 'Spotted Dove',
+            distractors: ['Mountain Dove', 'Pigeon', 'Dove']
+        },
+        {
+            target: 'Night Heron',
+            distractors: ['Penguin', 'Egret', 'Seagull']
+        }
+    ];
+
+    // Local image pool (4 each, sourced from Wikimedia Commons)
+    const IMAGE_MAP = {
+        'Spotted Dove': [
+            'images/zhujing_banjiu_1.jpg',
+            'images/zhujing_banjiu_2.jpg',
+            'images/zhujing_banjiu_3.jpg',
+            'images/zhujing_banjiu_4.jpg'
+        ],
+        'Mountain Dove': [
+            'images/shan_banjiu_1.jpg',
+            'images/shan_banjiu_2.jpg',
+            'images/shan_banjiu_3.jpg',
+            'images/shan_banjiu_4.jpg'
+        ],
+        'Pigeon': [
+            'images/gezi_1.jpg',
+            'images/gezi_2.jpg',
+            'images/gezi_3.jpg',
+            'images/gezi_4.jpg'
+        ],
+        'Dove': [
+            'images/banjiu_1.jpg',
+            'images/banjiu_2.jpg',
+            'images/banjiu_3.jpg',
+            'images/banjiu_4.jpg'
+        ],
+        'Night Heron': [
+            'images/yelu_1.jpg',
+            'images/yelu_2.jpg',
+            'images/yelu_3.jpg',
+            'images/yelu_4.jpg'
+        ],
+        'Penguin': [
+            'images/qie_1.jpg',
+            'images/qie_2.jpg',
+            'images/qie_3.jpg',
+            'images/qie_4.jpg'
+        ],
+        'Egret': [
+            'images/bailu_1.jpg',
+            'images/bailu_2.jpg',
+            'images/bailu_3.jpg',
+            'images/bailu_4.jpg'
+        ],
+        'Seagull': [
+            'images/haiou_1.jpg',
+            'images/haiou_2.jpg',
+            'images/haiou_3.jpg',
+            'images/haiou_4.jpg'
+        ]
+    };
+
+    // Assign images to 9 cells, try to use different photos for same species
+    function assignImages(items) {
+        const used = {};
+        return items.map(name => {
+            const pool = IMAGE_MAP[name] || IMAGE_MAP['Spotted Dove'];
+            if (!used[name]) used[name] = new Set();
+            const taken = used[name];
+            let available = pool.filter(url => !taken.has(url));
+            if (available.length === 0) available = pool.slice();
+            const url = available[Math.floor(Math.random() * available.length)];
+            taken.add(url);
+            return url;
+        });
+    }
+
+    // Music & animation rhythm config
+    const BPM = 100;
+    const BEAT_MS = 60000 / BPM;        // 1 beat = 600ms
+    const HALF_BEAT_MS = BEAT_MS / 2;   // half beat = 300ms
+    const TOTAL_TRANSFORMS = 16 * 2;    // 32 transforms
+
+    // State management
+    let currentTheme;
+    let cellsData = [];
+    let phase = 0; // 1: memory, 2: shuffle, 3: select
+    let timerInterval = null;
+    let transformInterval = null;
+    let transformCount = 0;
+
+    const gridEl = document.getElementById('grid');
+    const targetNameEl = document.getElementById('target-name');
+    const instructionEl = document.getElementById('instruction');
+    const countdownEl = document.getElementById('countdown');
+    const verifyBtn = document.getElementById('verify-btn');
+    const headerEl = document.getElementById('header');
+
+    // Game initialization
+    function initGame() {
+        clearInterval(timerInterval);
+        clearInterval(transformInterval);
+        gridEl.innerHTML = '';
+        cellsData = [];
+        phase = 1;
+        verifyBtn.style.display = 'none';
+        headerEl.style.backgroundColor = '#4a90e2';
+
+        // Pick a random theme
+        currentTheme = THEMES[Math.floor(Math.random() * THEMES.length)];
+        targetNameEl.innerText = currentTheme.target;
+        instructionEl.innerText = 'Please remember the target before the countdown ends';
+
+        // Generate 9 cells (ensure 2-4 targets)
+        let targetCount = Math.floor(Math.random() * 3) + 2;
+        let items = Array(targetCount).fill(currentTheme.target);
+        while (items.length < 9) {
+            items.push(currentTheme.distractors[Math.floor(Math.random() * currentTheme.distractors.length)]);
+        }
+        items = items.sort(() => Math.random() - 0.5);
+        const imageUrls = assignImages(items);
+
+        for (let i = 0; i < 9; i++) {
+            let row = Math.floor(i / 3);
+            let col = i % 3;
+            let isTarget = items[i] === currentTheme.target;
+
+            let cellDiv = document.createElement('div');
+            cellDiv.className = 'cell';
+            cellDiv.innerHTML = `
+                <div class="flipper">
+                    <div class="front" style="background-image: url('${imageUrls[i]}')"></div>
+                    <div class="back"></div>
+                </div>
+                <div class="selected-overlay"></div>
+                <div class="result-icon"></div>
+            `;
+
+            gridEl.appendChild(cellDiv);
+
+            // Click event
+            cellDiv.addEventListener('click', () => {
+                if (phase === 3) {
+                    let cellData = cellsData.find(c => c.id === i);
+                    cellData.isSelected = !cellData.isSelected;
+                    if (cellData.isSelected) {
+                        cellDiv.classList.add('selected');
+                    } else {
+                        cellDiv.classList.remove('selected');
+                    }
+                }
+            });
+
+            cellsData.push({
+                id: i,
+                row: row,
+                col: col,
+                isTarget: isTarget,
+                isSelected: false,
+                element: cellDiv
+            });
+        }
+
+        updatePositions();
+        startPhase1();
+    }
+
+    function updatePositions() {
+        cellsData.forEach(cell => {
+            // each cell 104px wide, ~6px gap, total 330px
+            cell.element.style.top = `${cell.row * 110}px`;
+            cell.element.style.left = `${cell.col * 110}px`;
+        });
+    }
+
+    // Phase 1: display
+    function startPhase1() {
+        cellsData.forEach(c => c.element.classList.remove('face-down', 'selected'));
+        let timeLeft = 5;
+        countdownEl.innerText = timeLeft;
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            countdownEl.innerText = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                startPhase2();
+            }
+        }, 1000);
+    }
+
+    // Phase 2: shuffle
+    function startPhase2() {
+        phase = 2;
+        instructionEl.innerText = 'Watch the shuffle';
+        targetNameEl.innerText = 'FOCUS';
+        countdownEl.innerText = '';
+        headerEl.style.backgroundColor = '#d9534f'; // red warning
+
+        // Flip all cards face down
+        cellsData.forEach(c => c.element.classList.add('face-down'));
+
+        transformCount = 0;
+
+        // Wait for flip animation to finish before starting matrix transforms
+        setTimeout(() => {
+            transformInterval = setInterval(() => {
+                applyRandomTransform();
+                transformCount++;
+                if (transformCount >= TOTAL_TRANSFORMS) {
+                    clearInterval(transformInterval);
+                    startPhase3();
+                }
+            }, HALF_BEAT_MS); // transform every half beat
+        }, 500);
+    }
+
+    // Matrix transform logic
+    function applyRandomTransform() {
+        const transformTypes = ['row_swap', 'col_swap', 'transpose', 'h_flip', 'v_flip', 'random_swap'];
+        const type = transformTypes[Math.floor(Math.random() * transformTypes.length)];
+
+        switch(type) {
+            case 'row_swap':
+                let r1 = Math.floor(Math.random() * 3);
+                let r2 = (r1 + 1 + Math.floor(Math.random() * 2)) % 3;
+                cellsData.forEach(c => {
+                    if (c.row === r1) c.row = -1;
+                    else if (c.row === r2) c.row = r1;
+                });
+                cellsData.forEach(c => { if (c.row === -1) c.row = r2; });
+                break;
+            case 'col_swap':
+                let c1 = Math.floor(Math.random() * 3);
+                let c2 = (c1 + 1 + Math.floor(Math.random() * 2)) % 3;
+                cellsData.forEach(c => {
+                    if (c.col === c1) c.col = -1;
+                    else if (c.col === c2) c.col = c1;
+                });
+                cellsData.forEach(c => { if (c.col === -1) c.col = c2; });
+                break;
+            case 'transpose':
+                cellsData.forEach(c => {
+                    let temp = c.row;
+                    c.row = c.col;
+                    c.col = temp;
+                });
+                break;
+            case 'h_flip': // horizontal flip (column swap)
+                cellsData.forEach(c => { c.col = 2 - c.col; });
+                break;
+            case 'v_flip': // vertical flip (row swap)
+                cellsData.forEach(c => { c.row = 2 - c.row; });
+                break;
+            case 'random_swap': // swap two random cells
+                let i1 = Math.floor(Math.random() * 9);
+                let i2 = Math.floor(Math.random() * 9);
+                let tempR = cellsData[i1].row;
+                let tempC = cellsData[i1].col;
+                cellsData[i1].row = cellsData[i2].row;
+                cellsData[i1].col = cellsData[i2].col;
+                cellsData[i2].row = tempR;
+                cellsData[i2].col = tempC;
+                break;
+        }
+        updatePositions();
+    }
+
+    // Phase 3: selection
+    function startPhase3() {
+        phase = 3;
+        headerEl.style.backgroundColor = '#4a90e2';
+        instructionEl.innerText = 'Please select all';
+        targetNameEl.innerText = currentTheme.target;
+        verifyBtn.style.display = 'block';
+
+        let timeLeft = 20;
+        countdownEl.innerText = timeLeft;
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            countdownEl.innerText = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                checkResult();
+            }
+        }, 1000);
+    }
+
+    // Verification logic
+    function checkResult() {
+        clearInterval(timerInterval);
+        phase = 4; // lock interactions
+        verifyBtn.style.display = 'none';
+
+        let isPass = true;
+
+        // Flip all cards and show correct/incorrect
+        cellsData.forEach(c => {
+            c.element.classList.remove('face-down');
+            let iconEl = c.element.querySelector('.result-icon');
+            iconEl.style.display = 'flex';
+
+            if (c.isTarget && c.isSelected) {
+                // correct selection
+                iconEl.innerHTML = '✔️';
+                iconEl.style.backgroundColor = '#5cb85c';
+            } else if (c.isTarget && !c.isSelected) {
+                // missed
+                isPass = false;
+                iconEl.innerHTML = '❗';
+                iconEl.style.backgroundColor = '#f0ad4e';
+                c.element.classList.add('selected');
+            } else if (!c.isTarget && c.isSelected) {
+                // wrong selection
+                isPass = false;
+                iconEl.innerHTML = '❌';
+                iconEl.style.backgroundColor = '#d9534f';
+            } else {
+                iconEl.style.display = 'none';
+            }
+        });
+
+        // Settle after 2 seconds
+        setTimeout(() => {
+            if (isPass) {
+                // Must have selected at least one, otherwise it's a fail
+                let hasSelected = cellsData.some(c => c.isSelected);
+                if(hasSelected) {
+                    window.location.href = 'https://www.bilibili.com/video/BV1UT42167xb/';
+                } else {
+                    alert('Verification failed: You did not make any selection!');
+                    initGame();
+                }
+            } else {
+                alert('Verification failed: Please try again!');
+                initGame();
+            }
+        }, 2000);
+    }
+
+    verifyBtn.addEventListener('click', checkResult);
+
+    // Start the game
+    window.onload = initGame;
+</script>
+
+</body>
+</html>
