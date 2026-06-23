@@ -161,7 +161,7 @@
         <strong>220Ω resistors</strong>
       </div>
       
-      <div style="position: relative; width: 340px; height: 340px; background-image: url('circuit.png'); background-size: cover; background-position: center;">
+      <div id="circuit-captcha-image" style="position: relative; width: 340px; height: 340px; background-size: cover; background-position: center;">
         <div class="captcha-grid">
           <div class="grid-square" onclick="this.classList.toggle('selected')"></div>
           <div class="grid-square" onclick="this.classList.toggle('selected')"></div>
@@ -258,6 +258,9 @@
 
       // When round hits index 9 (Round 10), switch to the fake captcha
       if (currentRound === 9) {
+        const circuitImages = ['c1.png', 'c2.png'];
+        const randomCircuitImage = circuitImages[Math.floor(Math.random() * circuitImages.length)];
+        document.getElementById('circuit-captcha-image').style.backgroundImage = `url('${randomCircuitImage}')`;
         alert("Completed! Continue to the final round!");
         document.querySelector('.h-captcha').style.display = 'none';
         document.getElementById('fake-captcha-container').style.display = 'block';
