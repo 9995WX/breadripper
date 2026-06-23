@@ -264,7 +264,7 @@
         const randomResistorValue = resistorValues[Math.floor(Math.random() * resistorValues.length)];
         document.getElementById('circuit-captcha-image').style.backgroundImage = `url('${randomCircuitImage}')`;
         document.getElementById('resistor-captcha-label').textContent = `${randomResistorValue} resistors`;
-        fakeVerifyAttempts = 0;
+        fakeSuccessChance = 0.05;
         lastFakeCaptchaSelection = null;
         document.getElementById('captcha-error').style.display = 'none';
         document.querySelectorAll('.grid-square').forEach(sq => sq.classList.remove('selected'));
@@ -305,7 +305,7 @@
     }
 
     // Fake Captcha Logic
-    let fakeVerifyAttempts = 0;
+    let fakeSuccessChance = 0.05;
     let lastFakeCaptchaSelection = null;
 
     function getFakeCaptchaSelection() {
@@ -319,7 +319,7 @@
       const errorMsg = document.getElementById('captcha-error');
       const currentSelection = getFakeCaptchaSelection();
       const selectionChanged = currentSelection !== lastFakeCaptchaSelection;
-      const successChance = selectionChanged ? Math.min(0.05 + fakeVerifyAttempts * 0.10, 1) : 0;
+      const successChance = selectionChanged ? fakeSuccessChance : 0;
 
       if (Math.random() < successChance) {
         clearInterval(timerInterval);
@@ -329,7 +329,7 @@
       }
 
       lastFakeCaptchaSelection = currentSelection;
-      fakeVerifyAttempts++;
+      fakeSuccessChance = selectionChanged ? Math.min(fakeSuccessChance + 0.10, 1) : 0.10;
       errorMsg.style.display = 'block';
     }
 
@@ -388,3 +388,4 @@
   </script>
 </body>
 </html>
+
