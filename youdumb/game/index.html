@@ -277,7 +277,11 @@
 
       if (currentRound >= 10) {
         alert("Idiot hacker! You looks dumb!");
-        failout();
+        let dumbScore = localStorage.getItem("dumbScore") || 0;
+        dumbScore++;
+        localStorage.setItem("dumbScore", dumbScore);
+        alert(`You've failed and admitted you're dumb ${dumbScore} time(s).`);
+        window.location.href = "/youdumb/ofc";
         return;
       }
 
