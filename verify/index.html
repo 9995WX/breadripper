@@ -24,6 +24,68 @@
             display: flex;
             flex-direction: column;
         }
+        .captcha-container.hidden {
+            display: none;
+        }
+        .start-screen {
+            background: white;
+            border: 1px solid #d7d7d7;
+            border-radius: 3px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            width: 304px;
+            min-height: 78px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px;
+            box-sizing: border-box;
+            cursor: pointer;
+            user-select: none;
+        }
+        .start-screen.hidden {
+            display: none;
+        }
+        .start-check {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #222;
+            font-size: 16px;
+        }
+        .start-checkbox {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #777;
+            border-radius: 2px;
+            box-sizing: border-box;
+            background: #fff;
+        }
+        .start-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #777;
+            font-size: 9px;
+            line-height: 1.1;
+        }
+        .start-logo {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            background:
+                linear-gradient(90deg, transparent 45%, #fff 45% 55%, transparent 55%),
+                linear-gradient(#4285f4, #4285f4);
+            position: relative;
+        }
+        .start-logo::before {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border: 3px solid #fff;
+            border-right-color: transparent;
+            border-radius: 50%;
+        }
         .header {
             background-color: #4a90e2;
             color: white;
@@ -150,7 +212,18 @@
 
 <audio id="focus-audio" src="focus.mp3" preload="auto" loop></audio>
 
-<div class="captcha-container">
+<div class="start-screen" id="start-screen" role="button" tabindex="0" aria-label="Start verification">
+    <div class="start-check">
+        <div class="start-checkbox"></div>
+        <div>I'm not a robot</div>
+    </div>
+    <div class="start-brand">
+        <div>CAPTCHA</div>
+        <div>Privacy - Terms</div>
+    </div>
+</div>
+
+<div class="captcha-container hidden" id="captcha-container">
     <div class="header" id="header">
         <div class="instruction" id="instruction">Please select the one containing</div>
         <div class="target" id="target-name">Loading...</div>
@@ -257,6 +330,7 @@
     let timerInterval = null;
     let transformInterval = null;
     let transformCount = 0;
+    let hasStarted = false;
 
     const gridEl = document.getElementById('grid');
     const targetNameEl = document.getElementById('target-name');
@@ -265,21 +339,21 @@
     const verifyBtn = document.getElementById('verify-btn');
     const headerEl = document.getElementById('header');
     const focusAudio = document.getElementById('focus-audio');
+    const startScreen = document.getElementById('start-screen');
+    const captchaContainer = document.getElementById('captcha-container');
 
     function startFocusAudio() {
         focusAudio.loop = true;
-        focusAudio.play().catch(() => {
-            const retryAudio = () => {
-                focusAudio.play();
-                window.removeEventListener('click', retryAudio);
-                window.removeEventListener('keydown', retryAudio);
-                window.removeEventListener('touchstart', retryAudio);
-            };
+        focusAudio.play();
+    }
 
-            window.addEventListener('click', retryAudio, { once: true });
-            window.addEventListener('keydown', retryAudio, { once: true });
-            window.addEventListener('touchstart', retryAudio, { once: true });
-        });
+    function startExperience() {
+        if (hasStarted) return;
+        hasStarted = true;
+        startFocusAudio();
+        startScreen.classList.add('hidden');
+        captchaContainer.classList.remove('hidden');
+        initGame();
     }
 
     // Game initialization
@@ -526,12 +600,14 @@
     }
 
     verifyBtn.addEventListener('click', checkResult);
+    startScreen.addEventListener('click', startExperience);
+    startScreen.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            startExperience();
+        }
+    });
 
-    // Start the game
-    window.onload = () => {
-        startFocusAudio();
-        initGame();
-    };
 </script>
 
 </body>
