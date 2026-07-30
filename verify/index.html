@@ -148,6 +148,8 @@
 </head>
 <body>
 
+<audio id="focus-audio" src="focus.mp3" preload="auto" loop></audio>
+
 <div class="captcha-container">
     <div class="header" id="header">
         <div class="instruction" id="instruction">Please select the one containing</div>
@@ -262,6 +264,23 @@
     const countdownEl = document.getElementById('countdown');
     const verifyBtn = document.getElementById('verify-btn');
     const headerEl = document.getElementById('header');
+    const focusAudio = document.getElementById('focus-audio');
+
+    function startFocusAudio() {
+        focusAudio.loop = true;
+        focusAudio.play().catch(() => {
+            const retryAudio = () => {
+                focusAudio.play();
+                window.removeEventListener('click', retryAudio);
+                window.removeEventListener('keydown', retryAudio);
+                window.removeEventListener('touchstart', retryAudio);
+            };
+
+            window.addEventListener('click', retryAudio, { once: true });
+            window.addEventListener('keydown', retryAudio, { once: true });
+            window.addEventListener('touchstart', retryAudio, { once: true });
+        });
+    }
 
     // Game initialization
     function initGame() {
@@ -343,7 +362,7 @@
     // Phase 1: display
     function startPhase1() {
         cellsData.forEach(c => c.element.classList.remove('face-down', 'selected'));
-        let timeLeft = 5;
+        let timeLeft = 20;
         countdownEl.innerText = timeLeft;
 
         timerInterval = setInterval(() => {
@@ -441,7 +460,7 @@
         targetNameEl.innerText = currentTheme.target;
         verifyBtn.style.display = 'block';
 
-        let timeLeft = 20;
+        let timeLeft = 180;
         countdownEl.innerText = timeLeft;
 
         timerInterval = setInterval(() => {
@@ -509,7 +528,10 @@
     verifyBtn.addEventListener('click', checkResult);
 
     // Start the game
-    window.onload = initGame;
+    window.onload = () => {
+        startFocusAudio();
+        initGame();
+    };
 </script>
 
 </body>
