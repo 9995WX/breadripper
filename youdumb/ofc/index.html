@@ -202,7 +202,9 @@
 </head>
 <body>
 
-  <div id="loading-screen">
+  
+  <audio id="victory-audio" src="victory.mp3" preload="auto"></audio>
+<div id="loading-screen">
     <h1>Making your certificate...</h1>
     <div class="progress-bar">
       <div class="progress-fill"></div>
@@ -235,7 +237,16 @@
   </div>
 
   <script>
-    // Set IP
+    
+    // Play victory sound from the beginning on every page click
+    const victoryAudio = document.getElementById('victory-audio');
+
+    document.addEventListener('click', () => {
+      victoryAudio.currentTime = 0;
+      victoryAudio.play().catch(() => {});
+    }, true);
+
+// Set IP
     fetch('https://api.ipify.org?format=json')
       .then(res => res.json())
       .then(data => {
