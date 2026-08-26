@@ -192,9 +192,10 @@
             <div class="api-selector">
                 <label for="apiSelect">翻译接口 API:</label>
                 <select id="apiSelect">
-                    <option value="https://translate.googleapis.com">Google 官方 API (默认)</option>
-                    <option value="https://apimirror-cf.earth.us.ci">CF worker-镜像 API (理论中国大陸可用，易触发谷歌风控而失败)</option>
-                    <option value="https://apimirror-hn.earth.us.ci">家宽-镜像 API</option>
+                    <option value="https://translate.googleapis.com">Google</option>
+                    <option value="https://apimirror-cf.earth.us.ci">Cloudflare 1</option>
+                    <option value="https://apimirror-hn.earth.us.ci">Cloudflare 2</option>
+                    <option value="">备用</option>
                 </select>
             </div>
 
@@ -214,8 +215,7 @@
         <div class="footer">
             由巨硬智能引擎强力驱动 | 副驾驶新时代<br>
             目前仅支持英译中 Only English to Chinese translation<br>
-            如结果仍为英文则为翻译失败，请重试。使用不同的API或许也有帮助。<br>
-            本站部分功能使用谷歌服务
+            如结果仍为英文则为翻译失败，请重试。使用不同的API或许也有帮助。
         </div>
     </div>
     
